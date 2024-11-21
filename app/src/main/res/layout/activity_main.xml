@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    :app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <FrameLayout
+        android:id="@+id/mainFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:background="@drawable/game_background">
+
+        <!-- 게임 배경 -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/game_background" />
+        <!-- 게임 캐릭터 -->
+        <ImageView
+            android:id="@+id/character"
+            android:layout_width="144dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/character_image" />
+        <!-- 점프 버튼 -->
+        <!-- 슬라이드 버튼 -->
+        <Button
+            android:id="@+id/jumpButton"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#FF6200EE"
+            android:text="Jump"
+            android:textColor="#FFFFFF" />
+
+        <!-- 설정 버튼 -->
+        <Button
+            android:id="@+id/slideButton"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="130dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#FF6200EE"
+            android:text="Slide"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/pauseButton"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="#FF6200EE"
+            android:text="Pause"
+            android:textColor="#FFFFFF" />
+        <!-- 오버레이 화면 -->
+        <FrameLayout
+            android:id="@+id/overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"
+            android:visibility="gone">
+            <!-- 일시정시 해제 버튼 -->
+            <Button
+                android:id="@+id/resumeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="#FF6200EE"
+                android:text="Resume"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
