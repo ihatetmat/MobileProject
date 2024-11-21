@@ -86,7 +86,7 @@ public class GameView extends View {
             Paint scorePaint = new Paint();
             scorePaint.setColor(Color.BLACK);
             scorePaint.setTextSize(60);
-            canvas.drawText("Score: " + model.getScore(), 50, 100, scorePaint);
+            canvas.drawText("Score: " + model.getScore1(), 50, 100, scorePaint);
         }
     }
 

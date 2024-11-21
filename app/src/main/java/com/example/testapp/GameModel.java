@@ -8,24 +8,25 @@ import java.util.Random;
 public class GameModel {
 
     private int playerCount; // 플레이어 수
-    private float character1X, character1Y; // 플레이어 1의 좌표
-    private float character2X, character2Y; // 플레이어 2의 좌표
-    private float speedX, speedY; // 이동 속도
-    private List<Obstacle> obstacles; // 장애물 리스트
-    private int score; // 점수
+    private int character1X, character1Y; // 플레이어 1의 좌표
+    private int character2X, character2Y; // 플레이어 2의 좌표 (2인용)
+    private List<Obstacle> obstacles;
+    private int score1, score2; // 각 플레이어의 점수
     private String gameState; // 게임 상태
 
     // 생성자: 1인용 또는 2인용 초기화
     public GameModel(int playerCount) {
         this.playerCount = playerCount;
-        this.character1X = 100; // 초기 x 위치
-        this.character1Y = 500; // 초기 y 위치
+        // todo: 초기 위치는 임시로 설정했습니다.
+        this.character1X = 0;
+        this.character1Y = 200;
         if (playerCount == 2) {
-            this.character2X = 100;
-            this.character2Y = 500;
+            this.character2X = 0;
+            this.character2Y = 0;
         }
         this.obstacles = new ArrayList<>();
-        this.score = 0;
+        this.score1 = 0;
+        this.score2 = 0;
         this.gameState = "시작";
     }
 
@@ -116,20 +117,9 @@ public class GameModel {
         return obstacles.removeIf(obstacle -> obstacle.getX() == x && obstacle.getY() == y);
     }
 
-    // 점수 업데이트
-    public void updateScore(int player) {
-        score++;
-    }
-
     // 게임 상태 설정
     public void setGameState(String state) {
         this.gameState = state;
-    }
-
-    // 상태 업데이트
-    public void update() {
-        this.character1X += speedX;
-        this.character1Y += speedY;
     }
 
     // 상태 초기화
@@ -140,8 +130,13 @@ public class GameModel {
             this.character2X = 100;
             this.character2Y = 500;
         }
-        this.score = 0;
+        this.score1 = 0;
+        this.score2 = 0;
         this.obstacles.clear();
+    }
+
+    public void update() {
+
     }
 
     // Getter 및 Setter
@@ -161,11 +156,11 @@ public class GameModel {
         return character2Y;
     }
 
-    public List<Obstacle> getObstacles() {
-        return obstacles;
+    public int getScore1() {
+        return this.score1;
     }
 
-    public int getScore() {
-        return score;
+    public List<Obstacle> getObstacles() {
+        return obstacles;
     }
 }

@@ -29,7 +29,6 @@
             android:layout_marginTop="30dp"
             android:src="@drawable/character_image" />
         <!-- 점프 버튼 -->
-        <!-- 슬라이드 버튼 -->
         <Button
             android:id="@+id/jumpButton"
             android:layout_width="100dp"
@@ -40,8 +39,7 @@
             android:backgroundTint="#FF6200EE"
             android:text="Jump"
             android:textColor="#FFFFFF" />
-
-        <!-- 설정 버튼 -->
+        <!-- 슬라이드 버튼 -->
         <Button
             android:id="@+id/slideButton"
             android:layout_width="100dp"
@@ -52,7 +50,7 @@
             android:backgroundTint="#FF6200EE"
             android:text="Slide"
             android:textColor="#FFFFFF" />
-
+        <!-- 설정 버튼 -->
         <Button
             android:id="@+id/pauseButton"
             android:layout_width="100dp"
@@ -62,6 +60,34 @@
             android:backgroundTint="#FF6200EE"
             android:text="Pause"
             android:textColor="#FFFFFF" />
+        <!-- 상대방 화면 -->
+        <FrameLayout
+            android:id="@+id/otherScreen"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="16dp"
+            android:background="#FFCCCCCC"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/otherLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:text="Opponent"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                android:layout_marginTop="5dp"/>
+
+            <ImageView
+                android:id="@+id/opponentPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/other_screen" />
+        </FrameLayout>
         <!-- 오버레이 화면 -->
         <FrameLayout
             android:id="@+id/overlay"

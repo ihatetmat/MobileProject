@@ -89,7 +89,6 @@ public class GameController {
         }
     }
 
-
     // 게임 상태 업데이트
     private void updateGameState() {
         if (playerCount >= 1) {
