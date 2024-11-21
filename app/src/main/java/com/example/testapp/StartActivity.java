@@ -25,5 +25,13 @@ public class StartActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        buttonHowTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(StartActivity.this, MenuActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

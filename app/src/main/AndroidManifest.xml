@@ -22,6 +22,7 @@
 
         <!-- 기존 MainActivity -->
         <activity android:name=".MainActivity" />
+        <activity android:name=".MenuActivity" />
     </application>
 
 </manifest>
