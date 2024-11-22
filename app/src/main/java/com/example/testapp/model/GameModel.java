@@ -1,5 +1,9 @@
 // shkim
-package com.example.testapp;
+package com.example.testapp.model;
+
+import android.content.Context;
+
+import com.example.testapp.object.Obstacle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +19,7 @@ public class GameModel {
     private String gameState; // 게임 상태
 
     // 생성자: 1인용 또는 2인용 초기화
-    public GameModel(int playerCount) {
+    public GameModel(Context context, int playerCount) {
         this.playerCount = playerCount;
         // todo: 초기 위치는 임시로 설정했습니다.
         this.character1X = 0;

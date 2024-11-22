@@ -1,4 +1,4 @@
-package com.example.testapp;
+package com.example.testapp.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.example.testapp.R;
+import com.example.testapp.controller.GameController;
+import com.example.testapp.model.GameModel;
+import com.example.testapp.view.GameView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
         resumeButton.setOnClickListener(onClickListener);
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
-        GameModel player1Model = new GameModel(1); // 캐릭터 초기 위치
-        gameController = new GameController(character, player1Model, 1);
+        GameModel player1Model = new GameModel(this, 1); // 캐릭터 초기 위치
+        GameView gameView = new GameView(this, 1, player1Model, character);
+        gameController = new GameController(character, player1Model, gameView, 1);
 
         // shkim
         // GameView 생성 및 추가
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
-        GameView gameView = new GameView(this, 1, player1Model);
         gameContainer.addView(gameView);
         gameView.invalidate();
         // shkim

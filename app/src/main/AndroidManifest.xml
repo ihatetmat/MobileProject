@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Testapp"
         tools:targetApi="31">
-        <activity android:name=".StartActivity"
+        <activity android:name=".activity.StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,8 +21,8 @@
         </activity>
 
         <!-- 기존 MainActivity -->
-        <activity android:name=".MainActivity" />
-        <activity android:name=".MenuActivity" />
+        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.MenuActivity" />
     </application>
 
 </manifest>

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <FrameLayout
         android:id="@+id/mainFrame"
@@ -21,14 +21,17 @@
             android:scaleType="centerCrop"
             android:src="@drawable/game_background" />
         <!-- 게임 캐릭터 -->
+        <!-- 점프 버튼 -->
+
         <ImageView
             android:id="@+id/character"
-            android:layout_width="144dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|start"
+            android:layout_width="83dp"
+            android:layout_height="85dp"
+            android:layout_gravity="bottom|start"
             android:layout_marginTop="30dp"
+            android:layout_marginBottom="80dp"
             android:src="@drawable/character_image" />
-        <!-- 점프 버튼 -->
+
         <Button
             android:id="@+id/jumpButton"
             android:layout_width="100dp"

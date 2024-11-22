@@ -1,4 +1,4 @@
-package com.example.testapp;
+package com.example.testapp.object;
 
 public class Obstacle {
     private int x, y, width, height;
