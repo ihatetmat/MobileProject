@@ -7,9 +7,6 @@
     tools:context=".activity.MenuActivity">
 
     <!-- 1인용 버튼 -->
-
-    <!-- 2인용 버튼 -->
-
     <Button
         android:id="@+id/onePlayerButton"
         android:layout_width="wrap_content"
@@ -22,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.45" />
-
+    <!-- 2인용 버튼 -->
     <Button
         android:id="@+id/twoPlayerButton"
         android:layout_width="wrap_content"
