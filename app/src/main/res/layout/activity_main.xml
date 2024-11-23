@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    :app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -61,33 +62,42 @@
             android:backgroundTint="#FF6200EE"
             android:text="Pause"
             android:textColor="#FFFFFF" />
-        <!-- 상대방 화면 -->
         <FrameLayout
-            android:id="@+id/otherScreen"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:layout_gravity="top|start"
-            android:layout_margin="16dp"
-            android:background="#FFCCCCCC"
-            android:visibility="gone">
+            android:id="@+id/progressFrame"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="16dp"
+            android:background="#FFDDDDDD"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
-                android:id="@+id/otherLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|center_horizontal"
-                android:text="Opponent"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:layout_marginTop="5dp"/>
-
-            <ImageView
-                android:id="@+id/opponentPreview"
+            <!-- 줄 표시 (Progress Bar 역할) -->
+            <View
+                android:id="@+id/progressLine"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/other_screen" />
+                android:layout_height="4dp"
+                android:layout_gravity="center_vertical"
+                android:background="#FF6200EE" />
+
+            <!-- 캐릭터 현재 위치 점 -->
+            <View
+                android:id="@+id/characterPosition"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="0dp"
+                android:background="@drawable/circle_shape" />
+            <!-- 상대방 캐릭터 위치 점 -->
+            <View
+                android:id="@+id/opponentPosition"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="0dp"
+                android:background="@drawable/circle_shape_opponent"
+                android:visibility="gone"/>
         </FrameLayout>
         <!-- 오버레이 화면 -->
         <FrameLayout

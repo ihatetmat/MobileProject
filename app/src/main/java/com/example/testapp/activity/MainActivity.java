@@ -1,11 +1,11 @@
 package com.example.testapp.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,8 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private GameController gameController;
     private FrameLayout overlay;
     private int playerCount;
-    private FrameLayout otherScreen;
-    private TextView otherLabel;
+    //private FrameLayout otherScreen;
+    //private TextView otherLabel;
+    private View characterPosition;
+    private View opponentPosition;
+    private View progressLine;
+    private Runnable updateRunnable;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +43,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
-        // 2인용 여부 확인
 
         // 캐릭터 및 버튼 초기화
         character = findViewById(R.id.character);
@@ -49,14 +54,17 @@ public class MainActivity extends AppCompatActivity {
         pauseButton = findViewById(R.id.pauseButton);
         resumeButton = findViewById(R.id.resumeButton);
         overlay = findViewById(R.id.overlay);
-        otherScreen = findViewById(R.id.otherScreen);
-        otherLabel = findViewById(R.id.otherLabel);
+        characterPosition = findViewById(R.id.characterPosition);
+        opponentPosition = findViewById(R.id.opponentPosition);
+        progressLine = findViewById(R.id.progressLine);
 
         if (playerCount == 2) {
-            otherScreen.setVisibility(View.VISIBLE);
+            opponentPosition.setVisibility(View.VISIBLE);
         } else {
-            otherScreen.setVisibility(View.GONE);
+            opponentPosition.setVisibility(View.GONE);
         }
+
+
         // OnClickListener 설정
         jumpButton.setOnClickListener(onClickListener);
         slideButton.setOnClickListener(onClickListener);
@@ -64,15 +72,24 @@ public class MainActivity extends AppCompatActivity {
         resumeButton.setOnClickListener(onClickListener);
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
-        GameModel player1Model = new GameModel(this, 1); // 캐릭터 초기 위치
-        GameView gameView = new GameView(this, 1, player1Model, character);
-        gameController = new GameController(character, player1Model, gameView, 1);
+        GameModel player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
+        GameView gameView = new GameView(this, playerCount, player1Model, character);
+        gameController = new GameController(character, player1Model, gameView, playerCount);
 
         // shkim
         // GameView 생성 및 추가
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
         gameContainer.addView(gameView);
         gameView.invalidate();
+        // 주기적으로 캐릭터 위치 업데이트
+        updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateCharacterPosition();
+                handler.postDelayed(this, 100); // 0.1초마다 갱신
+            }
+        };
+        handler.post(updateRunnable);
         // shkim
     }
 
@@ -104,5 +121,37 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    private void updateCharacterPosition() {
+        // 게임 모델의 현재 거리와 총 거리를 가져와 계산
+        int totalDistance = gameController.getGameModel().getTotalDistance();
+        int currentDistance = gameController.getGameModel().getCurrentDistance();
+
+        // 현재 거리의 비율 계산
+        float progress = (float) currentDistance / totalDistance;
+
+        // Progress Bar의 길이에 따라 점 위치 조정
+        int progressLineWidth = progressLine.getWidth();
+        int newPosition = (int) (progress * progressLineWidth);
+
+        // 점의 위치 업데이트
+        characterPosition.setTranslationX(newPosition);
+    }
+    // 상대방 캐릭터 위치 업데이트
+    private void updateOpponentPosition(int distance) {
+        // 총 거리와 상대방 거리 비율 계산
+        float progress = (float) distance / gameController.getGameModel().getTotalDistance();
+
+        // 상대방 Progress Line 위 점 위치 업데이트
+        int progressLineWidth = progressLine.getWidth();
+        int newPosition = (int) (progress * progressLineWidth);
+
+        // 상대방 점의 View를 이동
+        opponentPosition.setTranslationX(newPosition);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(updateRunnable);
+    }
 }
 

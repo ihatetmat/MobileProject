@@ -17,6 +17,8 @@ public class GameModel {
     private List<Obstacle> obstacles;
     private int score1, score2; // 각 플레이어의 점수
     private String gameState; // 게임 상태
+    private int totalDistance = 1000; // todo: 아직 예상이여서 추후에 정확한 값 정하기
+    private int currentDistance = 0;
 
     // 생성자: 1인용 또는 2인용 초기화
     public GameModel(Context context, int playerCount) {
@@ -167,4 +169,19 @@ public class GameModel {
     public List<Obstacle> getObstacles() {
         return obstacles;
     }
+
+    // 종민
+    public int getTotalDistance(){
+        return totalDistance;
+    }
+    public int getCurrentDistance(){
+        return currentDistance;
+    }
+    public void updateDistance(int distance) {
+        currentDistance += distance;
+        if (currentDistance > totalDistance) {
+            currentDistance = totalDistance;
+        }
+    }
+    // 종민
 }

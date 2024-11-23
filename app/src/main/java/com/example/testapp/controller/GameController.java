@@ -25,8 +25,8 @@ public class GameController {
         this.playerCount = playerCount;
         this.gameView = gameView;
 
-        if (playerCount == 2) {
-            throw new IllegalArgumentException("아직 기능이 없음. 2인용은 추가해야 함.");
+        if (playerCount != 1) {
+            throw new IllegalArgumentException("playerCount 오류");
         }
     }
 
@@ -110,4 +110,14 @@ public class GameController {
             updateView(player2View, player2Model);
         }
     }
+    public void moveCharacter(int distance){
+        player1Model.updateDistance(distance);
+        if (playerCount==2){
+            player2Model.updateDistance(distance);
+        }
+    }
+    public GameModel getGameModel() {
+        return player1Model; // GameModel 반환
+    }
+
 }
