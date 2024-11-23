@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
         gameContainer.addView(gameView);
         gameView.invalidate();
+
+        player1Model.move((character.getX() + (character.getWidth() / 2)), (character.getY() + character.getHeight()));
+
         // 주기적으로 캐릭터 위치 업데이트
         updateRunnable = new Runnable() {
             @Override

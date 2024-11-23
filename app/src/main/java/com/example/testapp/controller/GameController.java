@@ -56,7 +56,6 @@ public class GameController {
             return; // 슬라이딩 중 및 점프 중이면 점프 방지
         isSliding = true; // 슬라이딩 상태 시작
         updateView(); // 슬라이드 이미지 적용
-        player1Model.move(0, 200); // 모델 위치에서 y축 100만큼 이동
         isSliding = false;
     }
 

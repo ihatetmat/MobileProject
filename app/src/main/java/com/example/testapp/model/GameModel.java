@@ -2,6 +2,7 @@
 package com.example.testapp.model;
 
 import android.content.Context;
+import android.widget.ImageView;
 
 import com.example.testapp.object.Obstacle;
 
@@ -19,13 +20,15 @@ public class GameModel {
     private String gameState; // 게임 상태
     private int totalDistance = 1000; // todo: 아직 예상이여서 추후에 정확한 값 정하기
     private int currentDistance = 0;
+    private ImageView player;
 
     // 생성자: 1인용 또는 2인용 초기화
     public GameModel(Context context, int playerCount) {
         this.playerCount = playerCount;
         // todo: 초기 위치는 임시로 설정했습니다.
+        this.player = player;
         this.character1X = 0;
-        this.character1Y = 200;
+        this.character1Y = 0;
         if (playerCount == 2) {
             this.character2X = 0;
             this.character2Y = 0;
@@ -91,13 +94,16 @@ public class GameModel {
             int groundHeight,
             int minGap,
             int maxGap,
-            int characterX,
-            int characterWidth
+            ImageView character
     ) {
         Random random = new Random();
         obstacles.clear();
 
-        int previousX = characterX + characterWidth + 100; // 캐릭터의 끝 지점부터 시작
+        // 캐릭터의 X 좌표와 너비를 가져옵니다.
+        int characterX = (int) (character.getX() + character.getWidth());
+        int characterBottomY = (int) (character.getY() + character.getHeight());
+        int previousX = characterX + 100; // 캐릭터의 끝 지점부터 시작
+
         for (int i = 0; i < obstacleCount; i++) {
             int width = random.nextInt(50) + 50; // 장애물 너비 (50~100)
             int height = random.nextInt(50) + 50; // 장애물 높이 (50~100)
@@ -111,12 +117,14 @@ public class GameModel {
                 x = screenWidth - width;
             }
 
-            int y = screenHeight - groundHeight - height; // 땅 위에 위치
+            // 장애물의 Y 좌표는 땅 위에 위치
+            int y = characterBottomY - height;
 
             addObstacle(x, y, width, height);
             previousX = x; // 현재 X 좌표를 다음 계산을 위해 저장
         }
     }
+
 
     // 장애물 제거
     public boolean removeObstacle(int x, int y) {

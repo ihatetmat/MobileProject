@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -64,7 +65,8 @@ public class GameView extends View {
             int characterWidth = 50; // 캐릭터의 너비 (상수로 설정하거나 필요 시 동적으로 계산)
 
             if (model.getObstacles().isEmpty()) {
-                model.generateRandomObstacles(7, getWidth(), getHeight(), 100, 150, 300, characterX, characterWidth);
+                Log.d("GameView", "No obstacles generated. Generating obstacles.");
+                model.generateRandomObstacles(7, getWidth(), getHeight(), 100, 150, 300, player);
             }
             // shkim
             // 장애물 이미지 로드 (한 번만 로드)
@@ -72,6 +74,9 @@ public class GameView extends View {
 
             // 장애물 그리기
             for (Obstacle obstacle : model.getObstacles()) {
+                Log.d("GameView", "Obstacle - X: " + obstacle.getX() + ", Y: " + (obstacle.getY() + obstacle.getHeight()) +
+                        ", Width: " + obstacle.getWidth() + ", Height: " + obstacle.getHeight());
+
                 // 장애물 크기에 맞게 이미지 스케일링
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
                 canvas.drawBitmap(scaledBitmap, obstacle.getX(), obstacle.getY(), null);
@@ -107,14 +112,14 @@ public class GameView extends View {
             } else if (playerState == PlayerState.SLIDING) {
                 // 슬라이드 중일 때 슬라이드 이미지 적용
                 player.setImageResource(R.drawable.character_slide);
-                // 슬라이드 이미지가 붕 뜨지 않도록 약간 아래로 이동
-//                player.setY(model.getPlayer1Y());
+                Log.d("player", String.valueOf(player.getY()));
+                Log.d("player", String.valueOf(player.getHeight()));
                 // 슬라이드 상태 유지 시간 후에 원래 상태로 복원
                 player.postDelayed(() -> {
-                    model.move(0, -200); // 슬라이딩 위치에서 y축 100만큼 이동
                     invalidateView(PlayerState.DEFAULT);
-//                    player.setY(model.getPlayer1Y());
                 }, 200); // 슬라이드 유지 시간
+                Log.d("player", String.valueOf(player.getY()));
+                Log.d("player", String.valueOf(player.getHeight()));
             }
             // shkim
 
