@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private View progressLine;
     private Runnable updateRunnable;
     private Handler handler = new Handler();
+    private static final float CHARACTER_SPEED = 7.0f;
+    private Runnable collisionCheckRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,13 +78,17 @@ public class MainActivity extends AppCompatActivity {
         GameView gameView = new GameView(this, playerCount, player1Model, character);
         gameController = new GameController(character, player1Model, gameView, playerCount);
 
+        // 레이아웃 완료 후 위치 가져오기
+        character.post(() -> {
+            player1Model.move((character.getX() + (character.getWidth() / 2)), (character.getY() + (character.getHeight() / 2)));
+            player1Model.setWidthAndHeight((character.getWidth() / 2), (character.getHeight() / 2));
+        });
+
         // shkim
         // GameView 생성 및 추가
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
         gameContainer.addView(gameView);
         gameView.invalidate();
-
-        player1Model.move((character.getX() + (character.getWidth() / 2)), (character.getY() + character.getHeight()));
 
         // 주기적으로 캐릭터 위치 업데이트
         updateRunnable = new Runnable() {
@@ -94,6 +100,26 @@ public class MainActivity extends AppCompatActivity {
         };
         handler.post(updateRunnable);
         // shkim
+
+        // 캐릭터 자동 이동 추가
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                moveCharacterRight();
+                handler.postDelayed(this, 16); // 약 60FPS (16ms 간격)
+            }
+        });
+
+        // 충돌 검사 Runnable 설정
+        collisionCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                player1Model.checkCollisions();
+                handler.postDelayed(this, 16);
+            }
+        };
+
+        handler.post(collisionCheckRunnable);
     }
 
     // OnClickListener 정의
@@ -155,6 +181,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateRunnable);
+    }
+
+    // shkim
+    private void moveCharacterRight() {
+        // 캐릭터의 현재 X 위치 가져오기
+        float currentX = character.getX();
+        // 새로운 X 위치 계산
+        float newX = currentX + CHARACTER_SPEED;
+        // 캐릭터 이동
+        character.setX(newX);
+        // 게임 모델에 반영
+        gameController.getGameModel().move(CHARACTER_SPEED, 0);
     }
 }
 

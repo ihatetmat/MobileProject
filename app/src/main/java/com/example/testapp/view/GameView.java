@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -65,8 +64,7 @@ public class GameView extends View {
             int characterWidth = 50; // 캐릭터의 너비 (상수로 설정하거나 필요 시 동적으로 계산)
 
             if (model.getObstacles().isEmpty()) {
-                Log.d("GameView", "No obstacles generated. Generating obstacles.");
-                model.generateRandomObstacles(7, getWidth(), getHeight(), 100, 150, 300, player);
+                model.generateRandomObstacles(3, getWidth(), getHeight(), 100, 300, 500, player);
             }
             // shkim
             // 장애물 이미지 로드 (한 번만 로드)
@@ -74,8 +72,6 @@ public class GameView extends View {
 
             // 장애물 그리기
             for (Obstacle obstacle : model.getObstacles()) {
-                Log.d("GameView", "Obstacle - X: " + obstacle.getX() + ", Y: " + (obstacle.getY() + obstacle.getHeight()) +
-                        ", Width: " + obstacle.getWidth() + ", Height: " + obstacle.getHeight());
 
                 // 장애물 크기에 맞게 이미지 스케일링
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
@@ -90,14 +86,15 @@ public class GameView extends View {
                 player.setImageResource(R.drawable.character_jump);
                 // 점프 애니메이션 시작
                 player.animate()
-                        .translationYBy(-200f)  // 위로 200픽셀 이동
+                        .translationYBy(-300f)  // 위로 200픽셀 이동
+                        .translationXBy(100f)
                         .setDuration(200)       // 200ms 동안 애니메이션
                         .withEndAction(new Runnable() {
                             @Override
                             public void run() {
                                 // 점프 후 내려오는 애니메이션 실행
                                 player.animate()
-                                        .translationYBy(200f)  // 아래로 200픽셀 이동
+                                        .translationYBy(300f)  // 아래로 200픽셀 이동
                                         .setDuration(200)
                                         .withEndAction(new Runnable() {
                                             @Override
@@ -112,36 +109,12 @@ public class GameView extends View {
             } else if (playerState == PlayerState.SLIDING) {
                 // 슬라이드 중일 때 슬라이드 이미지 적용
                 player.setImageResource(R.drawable.character_slide);
-                Log.d("player", String.valueOf(player.getY()));
-                Log.d("player", String.valueOf(player.getHeight()));
                 // 슬라이드 상태 유지 시간 후에 원래 상태로 복원
                 player.postDelayed(() -> {
                     invalidateView(PlayerState.DEFAULT);
                 }, 200); // 슬라이드 유지 시간
-                Log.d("player", String.valueOf(player.getY()));
-                Log.d("player", String.valueOf(player.getHeight()));
             }
-            // shkim
 
-            // 플레이어 1 그리기
-//            canvas.drawCircle(model.getPlayer1X(), model.getPlayer1Y(), 50, paintPlayer1);
-
-            // 플레이어 2 그리기 (2인용일 때만)
-//            if (playerCount > 1) {
-//                canvas.drawCircle(model.getPlayer2X(), model.getPlayer2Y(), 50, paintPlayer2);
-//            }
-
-            // 장애물 그리기
-//            Paint obstaclePaint = new Paint();
-//            obstaclePaint.setColor(Color.GRAY);
-//            for (GameModel.Obstacle obstacle : model.getObstacles()) {
-//                canvas.drawRect(obstacle.getX(), obstacle.getY(),
-//                        obstacle.getX() + obstacle.getWidth(),
-//                        obstacle.getY() + obstacle.getHeight(),
-//                        obstaclePaint);
-//            }
-
-            // 점수 표시
             Paint scorePaint = new Paint();
             scorePaint.setColor(Color.BLACK);
             scorePaint.setTextSize(60);

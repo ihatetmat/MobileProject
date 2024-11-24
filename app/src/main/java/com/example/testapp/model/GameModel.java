@@ -2,6 +2,7 @@
 package com.example.testapp.model;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.testapp.object.Obstacle;
@@ -13,20 +14,22 @@ import java.util.Random;
 public class GameModel {
 
     private int playerCount; // 플레이어 수
-    private int character1X, character1Y; // 플레이어 1의 좌표
-    private int character2X, character2Y; // 플레이어 2의 좌표 (2인용)
+    private float character1X, character1Y; // 플레이어 1의 좌표
+    private float character1Width, character1Height;
+    private float character2X, character2Y; // 플레이어 2의 좌표 (2인용)
     private List<Obstacle> obstacles;
     private int score1, score2; // 각 플레이어의 점수
+    private int playerHealth = 3; // 플레이어 체력
     private String gameState; // 게임 상태
     private int totalDistance = 1000; // todo: 아직 예상이여서 추후에 정확한 값 정하기
     private int currentDistance = 0;
-    private ImageView player;
+    private boolean isColliding = false;
+
 
     // 생성자: 1인용 또는 2인용 초기화
     public GameModel(Context context, int playerCount) {
         this.playerCount = playerCount;
         // todo: 초기 위치는 임시로 설정했습니다.
-        this.player = player;
         this.character1X = 0;
         this.character1Y = 0;
         if (playerCount == 2) {
@@ -37,6 +40,60 @@ public class GameModel {
         this.score1 = 0;
         this.score2 = 0;
         this.gameState = "시작";
+    }
+
+    public void checkCollisions() {
+        if (detectCollision()) {
+            if (!isColliding) { // 새로 충돌한 경우에만 처리
+                handleCollision();
+                isColliding = true;
+            }
+        } else {
+            isColliding = false; // 충돌이 해소되면 다시 감지 가능
+        }
+    }
+
+    private void handleCollision() {
+        reduceHealth();
+        int health = getPlayerHealth();
+        Log.d("health", String.valueOf(health));
+
+        if (health <= 0) {
+            endGame();
+        }
+    }
+
+    public boolean detectCollision() {
+        // 캐릭터 경계 사각형 계산
+        float charLeft = this.character1X - (this.character1Width / 2.0f);
+        float charTop = this.character1Y - (this.character1Height / 2.0f);
+        float charRight = this.character1X + (this.character1Width / 2.0f);
+        float charBottom = this.character1Y + (this.character1Height / 2.0f);
+
+        for (Obstacle obstacle : this.obstacles) {
+            // 장애물 경계 사각형 계산
+            float obsLeft = obstacle.getX();
+            float obsTop = obstacle.getY();
+            float obsRight = obstacle.getX() + obstacle.getWidth();
+            float obsBottom = obstacle.getY() + obstacle.getHeight();
+
+            // AABB 충돌 판정
+            if (charLeft > obsRight) continue;
+            if (charTop > obsBottom) continue;
+            if (charRight < obsLeft) continue;
+            if (charBottom < obsTop) continue;
+
+            return true; // 충돌 발생
+        }
+
+        return false; // 충돌 없음
+    }
+
+
+
+
+    private void endGame() {
+        // 게임 종료 로직
     }
 
     // 플레이어 이동
@@ -56,30 +113,9 @@ public class GameModel {
         this.character1Y += dy;
     }
 
-    // 충돌 검사
-    public boolean checkCollision(int player) {
-        float playerX, playerY;
-
-        if (player == 1) {
-            playerX = character1X;
-            playerY = character1Y;
-        } else if (player == 2 && playerCount == 2) {
-            playerX = character2X;
-            playerY = character2Y;
-        } else {
-            return false; // 잘못된 플레이어
-        }
-
-        for (Obstacle obstacle : obstacles) {
-            if (playerX < obstacle.getX() + obstacle.getWidth() &&
-                    playerX + 50 > obstacle.getX() &&
-                    playerY < obstacle.getY() + obstacle.getHeight() &&
-                    playerY + 50 > obstacle.getY()) {
-                return true;
-            }
-        }
-
-        return false;
+    public void setWidthAndHeight(float width, float height) {
+        this.character1Width = width;
+        this.character1Height = height;
     }
 
     // 장애물 추가
@@ -176,6 +212,18 @@ public class GameModel {
 
     public List<Obstacle> getObstacles() {
         return obstacles;
+    }
+
+    public void removeObstacle(Obstacle obstacle) {
+        obstacles.remove(obstacle);
+    }
+
+    public void reduceHealth() {
+        playerHealth--;
+    }
+
+    public int getPlayerHealth() {
+        return playerHealth;
     }
 
     // 종민
