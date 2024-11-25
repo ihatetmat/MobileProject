@@ -21,6 +21,7 @@ public class GameView extends View {
     private GameModel model; // 게임 모델 객체
     private ImageView player;
     private PlayerState playerState;
+    private int hearts = 3; // 하트 개수
 
     public enum PlayerState {
         DEFAULT(0), JUMPING(1), SLIDING(2);
@@ -58,63 +59,67 @@ public class GameView extends View {
 
         // 게임 모델로부터 플레이어와 장애물 정보를 가져와 그리기
         if (model != null) {
-            // shkim ( 장애물 생성 )
-            // 캐릭터의 위치를 기반으로 장애물 생성
+            // 장애물 생성 및 그리기
             int characterX = (int) model.getPlayer1X(); // 캐릭터의 현재 X 좌표
             int characterWidth = 50; // 캐릭터의 너비 (상수로 설정하거나 필요 시 동적으로 계산)
 
             if (model.getObstacles().isEmpty()) {
                 model.generateRandomObstacles(3, getWidth(), getHeight(), 100, 300, 500, player);
             }
-            // shkim
+
             // 장애물 이미지 로드 (한 번만 로드)
             Bitmap obstacleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.obstacle_image);
 
             // 장애물 그리기
             for (Obstacle obstacle : model.getObstacles()) {
-
-                // 장애물 크기에 맞게 이미지 스케일링
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
                 canvas.drawBitmap(scaledBitmap, obstacle.getX(), obstacle.getY(), null);
             }
-            // shkim
 
+            // 하트 그리기
+            Bitmap heartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.heart); // 하트 이미지 로드
+            int heartSize = 100; // 하트 크기
+            int startX = getWidth() - (heartSize * hearts + 20 * (hearts - 1) + 50); // 하트들이 오른쪽 끝에 배치되도록 X 좌표 계산
+            int startY = 150; // Y 좌표를 150으로 설정하여 점수와 겹치지 않게 조정
 
+            // 하트 3개 그리기 (하트가 깎일 때마다 개수 조정)
+            for (int i = 0; i < hearts; i++) {
+                Bitmap scaledHeart = Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false);
+                canvas.drawBitmap(scaledHeart, startX + (i * (heartSize + 20)), startY, null); // 하트 간격 조정
+            }
+
+            // 플레이어 상태에 따른 애니메이션 및 상태 변경
             if (playerState == PlayerState.DEFAULT) {
                 player.setImageResource(R.drawable.character_image);
             } else if (playerState == PlayerState.JUMPING) {
                 player.setImageResource(R.drawable.character_jump);
-                // 점프 애니메이션 시작
                 player.animate()
-                        .translationYBy(-300f)  // 위로 200픽셀 이동
+                        .translationYBy(-300f)
                         .translationXBy(100f)
-                        .setDuration(200)       // 200ms 동안 애니메이션
+                        .setDuration(200)
                         .withEndAction(new Runnable() {
                             @Override
                             public void run() {
-                                // 점프 후 내려오는 애니메이션 실행
                                 player.animate()
-                                        .translationYBy(300f)  // 아래로 200픽셀 이동
+                                        .translationYBy(300f)
                                         .setDuration(200)
                                         .withEndAction(new Runnable() {
                                             @Override
                                             public void run() {
-                                                // 모델 위치 복원 (y축 아래로 200만큼 이동)
-                                                model.move(0, 200); // 모델 복귀
+                                                model.move(0, 200);
                                                 invalidateView(PlayerState.DEFAULT);
                                             }
                                         });
                             }
                         });
             } else if (playerState == PlayerState.SLIDING) {
-                // 슬라이드 중일 때 슬라이드 이미지 적용
                 player.setImageResource(R.drawable.character_slide);
-                // 슬라이드 상태 유지 시간 후에 원래 상태로 복원
                 player.postDelayed(() -> {
                     invalidateView(PlayerState.DEFAULT);
-                }, 200); // 슬라이드 유지 시간
+                }, 200);
             }
 
+            // 점수 그리기
             Paint scorePaint = new Paint();
             scorePaint.setColor(Color.BLACK);
             scorePaint.setTextSize(60);
@@ -122,9 +127,18 @@ public class GameView extends View {
         }
     }
 
+
     // 화면 갱신
-    public void invalidateView(PlayerState playerState) {
-        this.playerState = playerState;
-        invalidate(); // onDraw 호출
+        public void invalidateView(PlayerState playerState) {
+            this.playerState = playerState;
+            invalidate(); // onDraw 호출
+        }
+
+        // 하트 하나 깎는 메소드
+        public void loseHeart() {
+            if (hearts > 0) {
+                hearts--;
+                invalidate(); // 화면 갱신
+        }
     }
 }
