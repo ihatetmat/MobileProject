@@ -90,8 +90,6 @@ public class GameModel {
     }
 
 
-
-
     private void endGame() {
         // 게임 종료 로직
     }

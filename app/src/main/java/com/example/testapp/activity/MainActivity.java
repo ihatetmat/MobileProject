@@ -16,7 +16,11 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.testapp.R;
 import com.example.testapp.controller.GameController;
 import com.example.testapp.model.GameModel;
+import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
         // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
-
+        // 장애물 리스트 생성
+        List<Obstacle> obstacles = new ArrayList<>();
         // 캐릭터 및 버튼 초기화
         character = findViewById(R.id.character);
         jumpButton = findViewById(R.id.jumpButton);
@@ -76,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
         GameModel player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
         GameView gameView = new GameView(this, playerCount, player1Model, character);
-        gameController = new GameController(character, player1Model, gameView, playerCount);
+        gameController = new GameController(character, player1Model, gameView, playerCount, obstacles);
 
         // 레이아웃 완료 후 위치 가져오기
         character.post(() -> {
@@ -133,20 +138,10 @@ public class MainActivity extends AppCompatActivity {
                 gameController.sliding();  // 슬라이드 동작
             } else if (id == R.id.pauseButton) {
                 gameController.pauseGame(); // 게임 일시정지
-                overlay.setVisibility(View.VISIBLE); // 오버레이 표시
-                resumeButton.setVisibility(View.VISIBLE); // Resume 버튼 표시
-                // 다른 버튼 비활성화
-                jumpButton.setEnabled(false);
-                slideButton.setEnabled(false);
-                pauseButton.setEnabled(false);
+                showOverlay();
             } else if (id == R.id.resumeButton) {
-                gameController.pauseGame(); // 게임 재진행
-                overlay.setVisibility(View.GONE); // 오버레이 숨김
-                resumeButton.setVisibility(View.GONE); // Resume 버튼 숨김
-                // 다른 버튼 활성화
-                jumpButton.setEnabled(true);
-                slideButton.setEnabled(true);
-                pauseButton.setEnabled(true);
+                gameController.resumeGame(); // 게임 재진행
+                hideOverlay();
             }
         }
     };
@@ -181,6 +176,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateRunnable);
+    }
+
+    // 일시정지 오버레이 표시
+    private void showOverlay() {
+        //overlay 및 resume 버튼 활성화
+        overlay.setVisibility(View.VISIBLE);
+        resumeButton.setVisibility(View.VISIBLE);
+        // 다른 버튼 비활성화
+        jumpButton.setEnabled(false);
+        slideButton.setEnabled(false);
+        pauseButton.setEnabled(false);
+    }
+    // 일시정지 오버레이 숨김
+    private void hideOverlay() {
+        //overlay 및 resume 버튼 비활성화
+        overlay.setVisibility(View.GONE);
+        resumeButton.setVisibility(View.GONE);
+        // 다른 버튼 활성화
+        jumpButton.setEnabled(true);
+        slideButton.setEnabled(true);
+        pauseButton.setEnabled(true);
     }
 
     // shkim
