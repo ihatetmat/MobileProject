@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
             opponentPosition.setVisibility(View.GONE);
         }
 
-
         // OnClickListener 설정
         jumpButton.setOnClickListener(onClickListener);
         slideButton.setOnClickListener(onClickListener);
@@ -197,6 +196,14 @@ public class MainActivity extends AppCompatActivity {
         jumpButton.setEnabled(true);
         slideButton.setEnabled(true);
         pauseButton.setEnabled(true);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (gameController != null) {
+            gameController.pauseGame(); // 게임 일시정지
+        }
+        showOverlay(); // 오버레이 표시
     }
 
     // shkim
