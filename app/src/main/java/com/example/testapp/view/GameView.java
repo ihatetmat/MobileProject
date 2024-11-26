@@ -14,6 +14,9 @@ import com.example.testapp.R;
 import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameView extends View {
     private int playerCount; // 플레이어 수
     private Paint paintPlayer1; // 플레이어 1의 Paint 객체
@@ -21,7 +24,10 @@ public class GameView extends View {
     private GameModel model; // 게임 모델 객체
     private ImageView player;
     private PlayerState playerState;
+    private int initialState = 1;
     private int hearts = 3; // 하트 개수
+    private Bitmap heartBitmap;
+    private List<Bitmap> scaledHearts;
 
     public enum PlayerState {
         DEFAULT(0), JUMPING(1), SLIDING(2);
@@ -46,6 +52,19 @@ public class GameView extends View {
             paintPlayer2 = new Paint();
             paintPlayer2.setColor(Color.RED);
         }
+
+        initializeHearts();
+    }
+
+    private void initializeHearts() {
+        heartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.heart);
+        scaledHearts = new ArrayList<>();
+        int heartSize = 100;
+
+        for (int i = 0; i < 3; i++) {
+            Bitmap scaledHeart = Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false);
+            scaledHearts.add(scaledHeart);
+        }
     }
 
     // XML 레이아웃 파일에서 사용하는 기본 생성자
@@ -59,10 +78,6 @@ public class GameView extends View {
 
         // 게임 모델로부터 플레이어와 장애물 정보를 가져와 그리기
         if (model != null) {
-            // 장애물 생성 및 그리기
-            int characterX = (int) model.getPlayer1X(); // 캐릭터의 현재 X 좌표
-            int characterWidth = 50; // 캐릭터의 너비 (상수로 설정하거나 필요 시 동적으로 계산)
-
             if (model.getObstacles().isEmpty()) {
                 model.generateRandomObstacles(3, getWidth(), getHeight(), 100, 300, 500, player);
             }
@@ -77,15 +92,13 @@ public class GameView extends View {
             }
 
             // 하트 그리기
-            Bitmap heartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.heart); // 하트 이미지 로드
-            int heartSize = 100; // 하트 크기
-            int startX = getWidth() - (heartSize * hearts + 20 * (hearts - 1) + 50); // 하트들이 오른쪽 끝에 배치되도록 X 좌표 계산
-            int startY = 150; // Y 좌표를 150으로 설정하여 점수와 겹치지 않게 조정
+            int heartSize = 100;
+            int startX = getWidth() - (heartSize * hearts + 20 * (hearts - 1) + 50);
+            int startY = 150;
 
-            // 하트 3개 그리기 (하트가 깎일 때마다 개수 조정)
             for (int i = 0; i < hearts; i++) {
-                Bitmap scaledHeart = Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false);
-                canvas.drawBitmap(scaledHeart, startX + (i * (heartSize + 20)), startY, null); // 하트 간격 조정
+                Bitmap heart = scaledHearts.get(i);
+                canvas.drawBitmap(heart, startX + (i * (heartSize + 20)), startY, null);
             }
 
             // 플레이어 상태에 따른 애니메이션 및 상태 변경
