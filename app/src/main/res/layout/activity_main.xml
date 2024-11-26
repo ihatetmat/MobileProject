@@ -52,16 +52,9 @@
             android:backgroundTint="#FF6200EE"
             android:text="Slide"
             android:textColor="#FFFFFF" />
-        <!-- 설정 버튼 -->
-        <Button
-            android:id="@+id/pauseButton"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:layout_gravity="top|end"
-            android:layout_margin="16dp"
-            android:backgroundTint="#FF6200EE"
-            android:text="Pause"
-            android:textColor="#FFFFFF" />
+
+
+
         <FrameLayout
             android:id="@+id/progressFrame"
             android:layout_width="match_parent"
@@ -99,6 +92,20 @@
                 android:background="@drawable/circle_shape_opponent"
                 android:visibility="gone"/>
         </FrameLayout>
+
+        <!-- 설정 버튼 -->
+        <Button
+            android:id="@+id/pauseButton"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="#FF6200EE"
+            android:text="Pause"
+            android:textColor="#FFFFFF" />
+
+
+
         <!-- 오버레이 화면 -->
         <FrameLayout
             android:id="@+id/overlay"
