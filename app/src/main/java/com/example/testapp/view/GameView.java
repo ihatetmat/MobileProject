@@ -26,7 +26,9 @@ public class GameView extends View {
     private PlayerState playerState;
     private int initialState = 1;
     private int hearts = 3; // 하트 개수
+    private Bitmap obstacleBitmap;
     private Bitmap heartBitmap;
+    private List<Bitmap> scaledObstacles;
     private List<Bitmap> scaledHearts;
 
     public enum PlayerState {
@@ -52,7 +54,6 @@ public class GameView extends View {
             paintPlayer2 = new Paint();
             paintPlayer2.setColor(Color.RED);
         }
-
         initializeHearts();
     }
 
@@ -67,6 +68,20 @@ public class GameView extends View {
         }
     }
 
+    private void initializeObstacles() {
+        obstacleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.obstacle_image);
+        scaledObstacles = new ArrayList<>();
+
+        if (model.getObstacles().isEmpty()) {
+            model.generateRandomObstacles(3, getWidth(), getHeight(), 100, 300, 500, player);
+        }
+
+        for (Obstacle obstacle : model.getObstacles()) {
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
+            scaledObstacles.add(scaledBitmap);
+        }
+    }
+
     // XML 레이아웃 파일에서 사용하는 기본 생성자
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -78,18 +93,17 @@ public class GameView extends View {
 
         // 게임 모델로부터 플레이어와 장애물 정보를 가져와 그리기
         if (model != null) {
-            if (model.getObstacles().isEmpty()) {
-                model.generateRandomObstacles(3, getWidth(), getHeight(), 100, 300, 500, player);
+            if (scaledObstacles == null || scaledObstacles.size() != model.getObstacles().size()) {
+                initializeObstacles(); // 장애물 비트맵 동기화
             }
-
-            // 장애물 이미지 로드 (한 번만 로드)
-            Bitmap obstacleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.obstacle_image);
 
             // 장애물 그리기
-            for (Obstacle obstacle : model.getObstacles()) {
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
-                canvas.drawBitmap(scaledBitmap, obstacle.getX(), obstacle.getY(), null);
+            for (int i = 0; i < scaledObstacles.size(); i++) {
+                Obstacle obstacle = model.getObstacles().get(i);
+                Bitmap obstacleBitmap = scaledObstacles.get(i);
+                canvas.drawBitmap(obstacleBitmap, obstacle.getX(), obstacle.getY(), null);
             }
+
 
             // 하트 그리기
             int heartSize = 100;
