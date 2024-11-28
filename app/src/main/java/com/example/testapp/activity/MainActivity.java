@@ -18,6 +18,9 @@ import com.example.testapp.controller.GameController;
 import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +29,11 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView character;
     private Button jumpButton, slideButton, pauseButton, resumeButton;
+    private GameModel playerModel;
     private GameController gameController;
+    private GameView gameView;
     private FrameLayout overlay;
     private int playerCount;
-    //private FrameLayout otherScreen;
-    //private TextView otherLabel;
     private View characterPosition;
     private View opponentPosition;
     private View progressLine;
@@ -38,10 +41,15 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private static final float CHARACTER_SPEED = 7.0f;
     private Runnable collisionCheckRunnable;
+    public String sessionId; // 세션 ID 예시
+    public String playerId;    // 또는 "player2"
+    // 장애물 리스트 생성
+    List<Obstacle> obstacles = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this); // Firebase 초기화
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -49,11 +57,30 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference gameRef = database.getReference("gameSession");
         // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
-        // 장애물 리스트 생성
-        List<Obstacle> obstacles = new ArrayList<>();
+        // 세션 ID 자동 생성
+        if (playerCount == 2) {
+            sessionId = getIntent().getStringExtra("sessionId");
+            if (sessionId == null) {
+                sessionId = generateSessionId();
+                playerId = "player1"; // 처음 생성한 플레이어는 player1
+            } else {
+                playerId = "player2"; // 이미 세션이 존재하면 player2로 설정
+            }
+
+            // Firebase에서 세션 데이터 추가
+            gameRef.child(sessionId).child(playerId).child("isPlaying").setValue(true);
+            gameRef.child(sessionId).child(playerId).child("distance").setValue(0);
+        }
+        // 1인용 게임일 경우
+        else {
+            sessionId = null;
+            playerId = null;
+        }
         // 캐릭터 및 버튼 초기화
         character = findViewById(R.id.character);
         jumpButton = findViewById(R.id.jumpButton);
@@ -78,14 +105,14 @@ public class MainActivity extends AppCompatActivity {
         resumeButton.setOnClickListener(onClickListener);
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
-        GameModel player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
-        GameView gameView = new GameView(this, playerCount, player1Model, character);
-        gameController = new GameController(character, player1Model, gameView, playerCount, obstacles);
+        playerModel = new GameModel(this, playerCount); // 캐릭터 초기 위치
+        gameView = new GameView(this, playerCount, playerModel, character);
+        gameController = new GameController(character, playerModel, gameView, playerCount, obstacles, null, null);
 
         // 레이아웃 완료 후 위치 가져오기
         character.post(() -> {
-            player1Model.move((character.getX() + (character.getWidth() / 2)), (character.getY() + (character.getHeight() / 2)));
-            player1Model.setWidthAndHeight((character.getWidth() / 2), (character.getHeight() / 2));
+            playerModel.move((character.getX() + (character.getWidth() / 2)), (character.getY() + (character.getHeight() / 2)));
+            playerModel.setWidthAndHeight((character.getWidth() / 2), (character.getHeight() / 2));
         });
 
         // shkim
@@ -118,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         collisionCheckRunnable = new Runnable() {
             @Override
             public void run() {
-                player1Model.checkCollisions();
+                playerModel.checkCollisions();
                 handler.postDelayed(this, 16);
             }
         };
@@ -204,6 +231,24 @@ public class MainActivity extends AppCompatActivity {
             gameController.pauseGame(); // 게임 일시정지
         }
         showOverlay(); // 오버레이 표시
+    }
+    private void startGame(boolean isMultiplayer, String sessionId, String playerId) {
+        if (isMultiplayer) {
+            gameController = new GameController(character, playerModel, gameView, playerCount, obstacles, sessionId, playerId);
+            gameController.listenToOpponent(); // 상대방 데이터 수신 시작
+        } else {
+            gameController = new GameController(character, playerModel, gameView, playerCount, obstacles, null, null); // 1인용
+        }
+    }
+    private String generateSessionId() {
+        return "session_" + System.currentTimeMillis(); // 타임스탬프 기반 고유 ID
+    }
+    private void exitGame() {
+        if (gameController != null) {
+            gameController.endGame(); // 게임 종료 처리
+        }
+        // 메뉴 화면으로 돌아가기
+        finish(); // 현재 액티비티 종료
     }
 
     // shkim
