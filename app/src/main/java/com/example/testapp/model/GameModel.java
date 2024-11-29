@@ -89,7 +89,6 @@ public class GameModel {
         return false; // 충돌 없음
     }
 
-
     private void endGame() {
         // 게임 종료 로직
     }
@@ -133,29 +132,23 @@ public class GameModel {
         Random random = new Random();
         obstacles.clear();
 
-        // 캐릭터의 X 좌표와 너비를 가져옵니다.
-        int characterX = (int) (character.getX() + character.getWidth());
-        int characterBottomY = (int) (character.getY() + character.getHeight());
-        int previousX = characterX + 100; // 캐릭터의 끝 지점부터 시작
+        // 땅의 Y 좌표를 기준으로 계산
+        int groundY = screenHeight - groundHeight; // 땅의 높이 기준
+        int previousX = (int) (character.getX() + character.getWidth()) + 100; // 캐릭터 끝 지점부터 시작
 
         for (int i = 0; i < obstacleCount; i++) {
             int width = random.nextInt(50) + 50; // 장애물 너비 (50~100)
             int height = random.nextInt(50) + 50; // 장애물 높이 (50~100)
-            int gap = random.nextInt(maxGap - minGap + 1) + minGap; // minGap ~ maxGap 범위의 간격 생성
+            int gap = random.nextInt(maxGap - minGap + 1) + minGap; // 장애물 간 간격
 
             // 장애물의 X 좌표는 이전 장애물의 끝 지점 + 간격
             int x = previousX + gap;
 
-            // 화면 너비를 초과하면 화면 끝에 생성
-            if (x + width > screenWidth) {
-                x = screenWidth - width;
-            }
-
             // 장애물의 Y 좌표는 땅 위에 위치
-            int y = characterBottomY - height;
+            int y = groundY - height;
 
             addObstacle(x, y, width, height);
-            previousX = x; // 현재 X 좌표를 다음 계산을 위해 저장
+            previousX = x; // 현재 장애물의 끝 지점을 다음 계산을 위해 저장
         }
     }
 

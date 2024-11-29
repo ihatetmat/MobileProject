@@ -14,7 +14,6 @@ import com.example.testapp.R;
 import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GameView extends View {
@@ -30,6 +29,7 @@ public class GameView extends View {
     private Bitmap heartBitmap;
     private List<Bitmap> scaledObstacles;
     private List<Bitmap> scaledHearts;
+    Paint scorePaint;
 
     public enum PlayerState {
         DEFAULT(0), JUMPING(1), SLIDING(2);
@@ -54,32 +54,13 @@ public class GameView extends View {
             paintPlayer2 = new Paint();
             paintPlayer2.setColor(Color.RED);
         }
-        initializeHearts();
-    }
 
-    private void initializeHearts() {
+        scorePaint = new Paint();
+        scorePaint.setColor(Color.BLACK);
+        scorePaint.setTextSize(60);
         heartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.heart);
-        scaledHearts = new ArrayList<>();
-        int heartSize = 100;
-
-        for (int i = 0; i < 3; i++) {
-            Bitmap scaledHeart = Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false);
-            scaledHearts.add(scaledHeart);
-        }
-    }
-
-    private void initializeObstacles() {
         obstacleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.obstacle_image);
-        scaledObstacles = new ArrayList<>();
-
-        if (model.getObstacles().isEmpty()) {
-            model.generateRandomObstacles(3, getWidth(), getHeight(), 100, 300, 500, player);
-        }
-
-        for (Obstacle obstacle : model.getObstacles()) {
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
-            scaledObstacles.add(scaledBitmap);
-        }
+        model.generateRandomObstacles(5, getWidth(), getHeight(), 100, 300, 500, player);
     }
 
     // XML 레이아웃 파일에서 사용하는 기본 생성자
@@ -91,19 +72,32 @@ public class GameView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // 게임 모델로부터 플레이어와 장애물 정보를 가져와 그리기
         if (model != null) {
-            if (scaledObstacles == null || scaledObstacles.size() != model.getObstacles().size()) {
-                initializeObstacles(); // 장애물 비트맵 동기화
-            }
+            hearts = model.getPlayerHealth();
+            List<Obstacle> obstacles = model.getObstacles();
+            for (Obstacle obstacle : obstacles) {
+                // 장애물 X 좌표 이동
+                obstacle.setX(obstacle.getX() - 10);
 
-            // 장애물 그리기
-            for (int i = 0; i < scaledObstacles.size(); i++) {
-                Obstacle obstacle = model.getObstacles().get(i);
-                Bitmap obstacleBitmap = scaledObstacles.get(i);
-                canvas.drawBitmap(obstacleBitmap, obstacle.getX(), obstacle.getY(), null);
-            }
+                // 장애물이 화면 밖으로 나가면 재배치
+                if (obstacle.getX() + obstacle.getWidth() < 0) {
+                    obstacle.setX(getWidth());
+                    int playerTop = player.getTop();
+                    int playerHeight = player.getHeight();
+                    int obstacleY = (int) (Math.random() * 2) == 0
+                            ? playerTop + (playerHeight / 2)
+                            : playerTop - obstacle.getHeight() + 50;
 
+                    obstacle.setY(obstacleY);
+                }
+
+                canvas.drawBitmap(
+                        Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false),
+                        obstacle.getX(),
+                        obstacle.getY(),
+                        null
+                );
+            }
 
             // 하트 그리기
             int heartSize = 100;
@@ -111,61 +105,69 @@ public class GameView extends View {
             int startY = 150;
 
             for (int i = 0; i < hearts; i++) {
-                Bitmap heart = scaledHearts.get(i);
-                canvas.drawBitmap(heart, startX + (i * (heartSize + 20)), startY, null);
+                canvas.drawBitmap(
+                        Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false),
+                        startX + (i * (heartSize + 20)),
+                        startY,
+                        null
+                );
             }
 
-            // 플레이어 상태에 따른 애니메이션 및 상태 변경
+            // 캐릭터 상태 처리
             if (playerState == PlayerState.DEFAULT) {
                 player.setImageResource(R.drawable.character_image);
             } else if (playerState == PlayerState.JUMPING) {
                 player.setImageResource(R.drawable.character_jump);
-                player.animate()
-                        .translationYBy(-300f)
-                        .translationXBy(100f)
-                        .setDuration(200)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                player.animate()
-                                        .translationYBy(300f)
-                                        .setDuration(200)
-                                        .withEndAction(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                model.move(0, 200);
-                                                invalidateView(PlayerState.DEFAULT);
-                                            }
-                                        });
-                            }
-                        });
             } else if (playerState == PlayerState.SLIDING) {
                 player.setImageResource(R.drawable.character_slide);
-                player.postDelayed(() -> {
-                    invalidateView(PlayerState.DEFAULT);
-                }, 200);
             }
 
-            // 점수 그리기
-            Paint scorePaint = new Paint();
-            scorePaint.setColor(Color.BLACK);
-            scorePaint.setTextSize(60);
             canvas.drawText("Score: " + model.getScore1(), 50, 100, scorePaint);
+            postInvalidateDelayed(8);
         }
     }
 
+    public void jump() {
+        if (playerState == PlayerState.DEFAULT) {
+            playerState = PlayerState.JUMPING;
+
+            player.animate()
+                    .translationYBy(-300f)
+                    .setDuration(200)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            player.animate()
+                                    .translationYBy(300f)
+                                    .setDuration(200)
+                                    .withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            model.move(0, 200);
+                                            invalidateView(PlayerState.DEFAULT);
+                                        }
+                                    });
+                        }
+                    });
+        }
+    }
+
+    public void slide() {
+        if (playerState == PlayerState.DEFAULT) {
+            playerState = PlayerState.SLIDING;
+
+            model.move(0, 50);
+
+            player.postDelayed(() -> {
+                invalidateView(PlayerState.DEFAULT);
+                model.move(0, -50);
+            }, 300);
+        }
+    }
 
     // 화면 갱신
-        public void invalidateView(PlayerState playerState) {
-            this.playerState = playerState;
-            invalidate(); // onDraw 호출
-        }
-
-        // 하트 하나 깎는 메소드
-        public void loseHeart() {
-            if (hearts > 0) {
-                hearts--;
-                invalidate(); // 화면 갱신
-        }
+    public void invalidateView(PlayerState playerState) {
+        this.playerState = playerState;
+        invalidate(); // onDraw 호출
     }
 }

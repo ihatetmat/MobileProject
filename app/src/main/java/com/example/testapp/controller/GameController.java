@@ -50,7 +50,8 @@ public class GameController {
         if (isJumping||isSliding)
             return; // 점프 및 슬라이딩 중이면 점프 방지
         isJumping = true;
-        updateView(); // 점프 중 모션 적용했습니다.
+        gameView.jump();
+//        updateView(); // 점프 중 모션 적용했습니다.
         player1Model.move(0, -200); // y축 위로 200 이동
         isJumping = false;
 
@@ -61,7 +62,8 @@ public class GameController {
         if (isSliding||isJumping)
             return; // 슬라이딩 중 및 점프 중이면 점프 방지
         isSliding = true; // 슬라이딩 상태 시작
-        updateView(); // 슬라이드 이미지 적용
+        gameView.slide();
+//        updateView(); // 슬라이드 이미지 적용
         isSliding = false;
     }
 
@@ -99,17 +101,6 @@ public class GameController {
             updateView(player2View, player2Model);
         }*/
         // todo: 충돌, 종료 조건, 스코어 계산 등 추가
-    }
-
-    // 뷰 업데이트
-    private void updateView(){
-        if (isJumping) {
-            gameView.invalidateView(GameView.PlayerState.JUMPING);
-        } else if (isSliding) {
-            gameView.invalidateView(GameView.PlayerState.SLIDING);
-        } else {
-            gameView.invalidateView(GameView.PlayerState.DEFAULT);
-        }
     }
 
     private void updateView(ImageView view, GameModel model) {

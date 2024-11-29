@@ -104,16 +104,6 @@ public class MainActivity extends AppCompatActivity {
         };
         handler.post(updateRunnable);
         // shkim
-
-        // 캐릭터 자동 이동 추가
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                moveCharacterRight();
-                handler.postDelayed(this, 16); // 약 60FPS (16ms 간격)
-            }
-        });
-
         // 충돌 검사 Runnable 설정
         collisionCheckRunnable = new Runnable() {
             @Override
@@ -204,18 +194,6 @@ public class MainActivity extends AppCompatActivity {
             gameController.pauseGame(); // 게임 일시정지
         }
         showOverlay(); // 오버레이 표시
-    }
-
-    // shkim
-    private void moveCharacterRight() {
-        // 캐릭터의 현재 X 위치 가져오기
-        float currentX = character.getX();
-        // 새로운 X 위치 계산
-        float newX = currentX + CHARACTER_SPEED;
-        // 캐릭터 이동
-        character.setX(newX);
-        // 게임 모델에 반영
-        gameController.getGameModel().move(CHARACTER_SPEED, 0);
     }
 }
 
