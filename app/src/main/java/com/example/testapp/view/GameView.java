@@ -83,7 +83,7 @@ public class GameView extends View {
             List<Obstacle> obstacles = model.getObstacles();
             for (Obstacle obstacle : obstacles) {
                 // 장애물 X 좌표 이동 (속도 300px/초로 고정)
-                obstacle.setX((int) (obstacle.getX() - 300 * deltaTime));
+                obstacle.setX((int) (obstacle.getX() - 500 * deltaTime));
 
                 // 장애물이 화면 밖으로 나가면 재배치
                 if (obstacle.getX() + obstacle.getWidth() < 0) {
@@ -125,7 +125,7 @@ public class GameView extends View {
             canvas.drawText("Score: " + model.getScore1(), 50, 100, scorePaint);
 
             // 일정 시간 간격으로 화면 다시 그리기
-            postInvalidateDelayed(16); // 약 60 FPS로 갱신
+            invalidate();
         }
     }
 
