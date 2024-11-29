@@ -68,16 +68,22 @@ public class GameView extends View {
         super(context, attrs);
     }
 
+    private long lastFrameTime = System.currentTimeMillis();
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        long currentTime = System.currentTimeMillis();
+        float deltaTime = (currentTime - lastFrameTime) / 1000f; // 초 단위
+        lastFrameTime = currentTime;
 
         if (model != null) {
             hearts = model.getPlayerHealth();
             List<Obstacle> obstacles = model.getObstacles();
             for (Obstacle obstacle : obstacles) {
-                // 장애물 X 좌표 이동
-                obstacle.setX(obstacle.getX() - 10);
+                // 장애물 X 좌표 이동 (속도 300px/초로 고정)
+                obstacle.setX((int) (obstacle.getX() - 300 * deltaTime));
 
                 // 장애물이 화면 밖으로 나가면 재배치
                 if (obstacle.getX() + obstacle.getWidth() < 0) {
@@ -91,12 +97,9 @@ public class GameView extends View {
                     obstacle.setY(obstacleY);
                 }
 
-                canvas.drawBitmap(
-                        Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false),
-                        obstacle.getX(),
-                        obstacle.getY(),
-                        null
-                );
+                // Bitmap 최적화
+                Bitmap scaledObstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
+                canvas.drawBitmap(scaledObstacleBitmap, obstacle.getX(), obstacle.getY(), null);
             }
 
             // 하트 그리기
@@ -105,12 +108,8 @@ public class GameView extends View {
             int startY = 150;
 
             for (int i = 0; i < hearts; i++) {
-                canvas.drawBitmap(
-                        Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false),
-                        startX + (i * (heartSize + 20)),
-                        startY,
-                        null
-                );
+                Bitmap scaledHeartBitmap = Bitmap.createScaledBitmap(heartBitmap, heartSize, heartSize, false);
+                canvas.drawBitmap(scaledHeartBitmap, startX + (i * (heartSize + 20)), startY, null);
             }
 
             // 캐릭터 상태 처리
@@ -122,11 +121,15 @@ public class GameView extends View {
                 player.setImageResource(R.drawable.character_slide);
             }
 
+            // 점수 표시
             canvas.drawText("Score: " + model.getScore1(), 50, 100, scorePaint);
-            postInvalidateDelayed(8);
+
+            // 일정 시간 간격으로 화면 다시 그리기
+            postInvalidateDelayed(16); // 약 60 FPS로 갱신
         }
     }
 
+    // 점프 기능
     public void jump() {
         if (playerState == PlayerState.DEFAULT) {
             playerState = PlayerState.JUMPING;
@@ -134,24 +137,19 @@ public class GameView extends View {
             player.animate()
                     .translationYBy(-300f)
                     .setDuration(200)
-                    .withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            player.animate()
-                                    .translationYBy(300f)
-                                    .setDuration(200)
-                                    .withEndAction(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            model.move(0, 200);
-                                            invalidateView(PlayerState.DEFAULT);
-                                        }
-                                    });
-                        }
+                    .withEndAction(() -> {
+                        player.animate()
+                                .translationYBy(300f)
+                                .setDuration(200)
+                                .withEndAction(() -> {
+                                    model.move(0, 200);
+                                    invalidateView(PlayerState.DEFAULT);
+                                });
                     });
         }
     }
 
+    // 슬라이드 기능
     public void slide() {
         if (playerState == PlayerState.DEFAULT) {
             playerState = PlayerState.SLIDING;
@@ -169,5 +167,6 @@ public class GameView extends View {
     public void invalidateView(PlayerState playerState) {
         this.playerState = playerState;
         invalidate(); // onDraw 호출
-    }
-}
+    }}
+
+
