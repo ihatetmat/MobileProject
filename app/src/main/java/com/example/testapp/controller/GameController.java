@@ -1,19 +1,11 @@
 package com.example.testapp.controller;
 
 import android.os.Handler;
-import android.util.Log;
 import android.widget.ImageView;
-
-import androidx.annotation.NonNull;
 
 import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -31,7 +23,6 @@ public class GameController {
     private List<Obstacle> obstacles; // 장애물 목록
     private String sessionId; // 세션 ID
     private String playerId;  // "player1" 또는 "player2"
-    private DatabaseReference gameRef;
 
     // 생성자: View와 Model 객체를 초기화
     public GameController(ImageView playerView, GameModel playerModel,GameView gameView, int playerCount, List<Obstacle> obstacles, String sessionId, String playerId) {
@@ -42,10 +33,8 @@ public class GameController {
         this.obstacles = obstacles;
         this.sessionId = sessionId;
         this.playerId = playerId;
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
         this.sessionId = sessionId;
         this.playerId = playerId;
-        this.gameRef = database.getReference("gameSession").child(sessionId);
 
         if (playerCount != 1 ) {
             throw new IllegalArgumentException("playerCount 오류");
@@ -94,7 +83,7 @@ public class GameController {
         playerModel.update();
         updateView();
         if (playerModel.checkGameOver()) {
-            endGame(); // 종료 처리
+            //endGame(); // 종료 처리
         }
         // todo: 충돌, 종료 조건, 스코어 계산 등 추가
     }
@@ -120,42 +109,5 @@ public class GameController {
     public GameModel getGameModel() {
         return playerModel; // GameModel 반환
     }
-    //플레이어의 거리를 Firebase에 실시간으로 업데이트
-    public void updateDistance(int distance) {
-        if (gameRef != null) {
-            gameRef.child(playerId).child("distance").setValue(distance);
-        }
-    }
-    // 상대방의 데이터를 실시간으로 수신하는 리스너
-    public void listenToOpponent() {
-        String opponentId = playerId.equals("player1") ? "player2" : "player1";
-        gameRef.child(opponentId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    int opponentDistance = snapshot.child("distance").getValue(Integer.class);
-                    boolean isOpponentPlaying = snapshot.child("isPlaying").getValue(Boolean.class);
-                    if (!isOpponentPlaying) {
-                        pauseGame(); // 상대방이 게임을 중단했으면 나도 일시정지
-                    } else {
-                        resumeGame(); // 상대방이 재개하면 나도 재개
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("GameController", "Failed to read opponent data", error.toException());
-            }
-        });
-    }
-    public void endGame() {
-        if (gameRef != null) {
-            gameRef.removeValue(); // Firebase 데이터 삭제
-        }
-        // 추가로 UI 리셋이나 종료 동작 처리
-        resetGame(); // 게임 모델 및 뷰 초기화
-    }
-
 
 }

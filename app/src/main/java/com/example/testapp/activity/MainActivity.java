@@ -19,8 +19,6 @@ import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference gameRef = database.getReference("gameSession");
         // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
@@ -66,15 +62,12 @@ public class MainActivity extends AppCompatActivity {
         if (playerCount == 2) {
             sessionId = getIntent().getStringExtra("sessionId");
             if (sessionId == null) {
-                sessionId = generateSessionId();
+                //sessionId = generateSessionId();
                 playerId = "player1"; // 처음 생성한 플레이어는 player1
             } else {
                 playerId = "player2"; // 이미 세션이 존재하면 player2로 설정
             }
 
-            // Firebase에서 세션 데이터 추가
-            gameRef.child(sessionId).child(playerId).child("isPlaying").setValue(true);
-            gameRef.child(sessionId).child(playerId).child("distance").setValue(0);
         }
         // 1인용 게임일 경우
         else {
@@ -232,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
         }
         showOverlay(); // 오버레이 표시
     }
+    /*
     private void startGame(boolean isMultiplayer, String sessionId, String playerId) {
         if (isMultiplayer) {
             gameController = new GameController(character, playerModel, gameView, playerCount, obstacles, sessionId, playerId);
@@ -242,10 +236,10 @@ public class MainActivity extends AppCompatActivity {
     }
     private String generateSessionId() {
         return "session_" + System.currentTimeMillis(); // 타임스탬프 기반 고유 ID
-    }
+    }*/
     private void exitGame() {
         if (gameController != null) {
-            gameController.endGame(); // 게임 종료 처리
+            //gameController.endGame(); // 게임 종료 처리
         }
         // 메뉴 화면으로 돌아가기
         finish(); // 현재 액티비티 종료

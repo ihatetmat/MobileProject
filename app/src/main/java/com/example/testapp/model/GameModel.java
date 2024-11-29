@@ -231,7 +231,7 @@ public class GameModel {
             currentDistance = totalDistance;
             isEnd = true;
         }
-        gameController.updateDistance(currentDistance);
+        //gameController.updateDistance(currentDistance);
     }
     public boolean checkGameOver() {
         return isEnd || currentDistance >= totalDistance;
