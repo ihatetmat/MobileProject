@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.example.testapp.controller.GameController;
 import com.example.testapp.object.Obstacle;
 
 import java.util.ArrayList;
@@ -24,7 +25,8 @@ public class GameModel {
     private int totalDistance = 1000; // todo: 아직 예상이여서 추후에 정확한 값 정하기
     private int currentDistance = 0;
     private boolean isColliding = false;
-
+    private GameController gameController;
+    private boolean isEnd;
 
     // 생성자: 1인용 또는 2인용 초기화
     public GameModel(Context context, int playerCount) {
@@ -40,6 +42,7 @@ public class GameModel {
         this.score1 = 0;
         this.score2 = 0;
         this.gameState = "시작";
+        this.isEnd = false;
     }
 
     public void checkCollisions() {
@@ -151,18 +154,14 @@ public class GameModel {
             previousX = x; // 현재 장애물의 끝 지점을 다음 계산을 위해 저장
         }
     }
-
-
     // 장애물 제거
     public boolean removeObstacle(int x, int y) {
         return obstacles.removeIf(obstacle -> obstacle.getX() == x && obstacle.getY() == y);
     }
-
     // 게임 상태 설정
     public void setGameState(String state) {
         this.gameState = state;
     }
-
     // 상태 초기화
     public void reset() {
         this.character1X = 100;
@@ -175,28 +174,23 @@ public class GameModel {
         this.score2 = 0;
         this.obstacles.clear();
     }
-
     public void update() {
-
+        // todo: 움직이는 거리는 정해지는 대로 바꾸기
+        updateDistance(10); // 임시 거리 설정
     }
-
     // Getter 및 Setter
     public float getPlayer1X() {
         return character1X;
     }
-
     public float getPlayer1Y() {
         return character1Y;
     }
-
     public float getPlayer2X() {
         return character2X;
     }
-
     public float getPlayer2Y() {
         return character2Y;
     }
-
     public int getScore1() {
         return this.score1;
     }
@@ -228,7 +222,13 @@ public class GameModel {
         currentDistance += distance;
         if (currentDistance > totalDistance) {
             currentDistance = totalDistance;
+            isEnd = true;
         }
+        //gameController.updateDistance(currentDistance);
     }
+    public boolean checkGameOver() {
+        return isEnd || currentDistance >= totalDistance;
+    }
+
     // 종민
 }
