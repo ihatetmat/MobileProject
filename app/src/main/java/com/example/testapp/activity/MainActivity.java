@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,10 @@ import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView character;
     private Button jumpButton, slideButton, pauseButton, resumeButton;
     private GameController gameController;
+    private GameModel player1Model;
+    private GameView gameView;
     private FrameLayout overlay;
     private int playerCount;
-    //private FrameLayout otherScreen;
-    //private TextView otherLabel;
     private View characterPosition;
     private View opponentPosition;
     private View progressLine;
@@ -38,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private static final float CHARACTER_SPEED = 7.0f;
     private Runnable collisionCheckRunnable;
+    private Runnable checkState;
+    private Socket socket = null;
+    private final int maxWaitingTime = 3000; // 3 초 대기
+    private DataOutputStream outStream = null;
+    private DataInputStream inStream = null;
+    private Object socketReady = new Object();
+    private Object inStreamReady = new Object();
+    private final String serverHost = "서버 IP주소"; // 서버 IP 주소
+    private final int serverPort = 9999; // 서버 포트 번호
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
+        //todo: 2인용인 경우 1인용인 경우 기능 추가
         // 장애물 리스트 생성
         List<Obstacle> obstacles = new ArrayList<>();
         // 캐릭터 및 버튼 초기화
@@ -78,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
         resumeButton.setOnClickListener(onClickListener);
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
-        GameModel player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
-        GameView gameView = new GameView(this, playerCount, player1Model, character);
+        player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
+        gameView = new GameView(this, playerCount, player1Model, character);
         gameController = new GameController(character, player1Model, gameView, playerCount, obstacles);
 
         // 레이아웃 완료 후 위치 가져오기
@@ -94,15 +109,7 @@ public class MainActivity extends AppCompatActivity {
         gameContainer.addView(gameView);
         gameView.invalidate();
 
-        // 주기적으로 캐릭터 위치 업데이트
-        updateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                updateCharacterPosition();
-                handler.postDelayed(this, 100); // 0.1초마다 갱신
-            }
-        };
-        handler.post(updateRunnable);
+        startGameLoop();
         // shkim
         // 충돌 검사 Runnable 설정
         collisionCheckRunnable = new Runnable() {
@@ -112,8 +119,34 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(this, 16);
             }
         };
-
         handler.post(collisionCheckRunnable);
+
+    }
+    // 게임 시작 루프
+    private void startGameLoop() {
+        updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // 캐릭터 위치 업데이트
+                updateCharacterPosition();
+                handler.postDelayed(this, 100); // 0.1초마다 갱신
+            }
+        };
+        handler.post(updateRunnable);
+        // 2인용인 경우 송수신 스레드 실행
+        if (playerCount == 2) {
+            // 서버 연결
+            boolean isConnected = connectServer();
+            if (!isConnected) {
+                Toast.makeText(this, "서버 연결 실패", Toast.LENGTH_SHORT).show();
+                finish(); // 연결 실패 시 종료
+                return;
+            }
+
+            // 수신 및 송신 스레드 시작
+            startThread(runnable4RecvThread);
+            startThread(runnable4SendThread);
+        }
     }
 
     // OnClickListener 정의
@@ -161,12 +194,14 @@ public class MainActivity extends AppCompatActivity {
         // 상대방 점의 View를 이동
         opponentPosition.setTranslationX(newPosition);
     }
+    //소멸자
     @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateRunnable);
+        if (playerCount == 2)
+            disconnectServer();
     }
-
     // 일시정지 오버레이 표시
     private void showOverlay() {
         //overlay 및 resume 버튼 활성화
@@ -187,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
         slideButton.setEnabled(true);
         pauseButton.setEnabled(true);
     }
+    // 일시정지
     @Override
     protected void onPause() {
         super.onPause();
@@ -194,6 +230,98 @@ public class MainActivity extends AppCompatActivity {
             gameController.pauseGame(); // 게임 일시정지
         }
         showOverlay(); // 오버레이 표시
+    }
+    ////// 서버 연결 준비
+    private boolean connectServer() {
+        synchronized (socketReady) {
+            try {
+                if (socket!=null)
+                    _disconnectServer();
+                socket = new Socket();
+                socket.connect(new InetSocketAddress(serverHost, serverPort), maxWaitingTime);
+                outStream = new DataOutputStream(socket.getOutputStream());
+                inStream = new DataInputStream(socket.getInputStream());
+                synchronized (inStreamReady) {
+                    inStreamReady.notify(); // 데이터 수신 준비
+                }
+                return true;
+            } catch (Exception e) {
+                _disconnectServer();
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+    // 서버 연결 종료
+    private  void disconnectServer(){
+        synchronized (socketReady){
+            _disconnectServer();
+        }
+    }
+    private void _disconnectServer() {
+        synchronized (socketReady) {
+            try {
+                if (outStream != null) outStream.close();
+                if (inStream != null) inStream.close();
+                if (socket != null) socket.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            outStream = null;
+            inStream = null;
+            socket = null;
+        }
+    }
+    // 수신 스레드
+    private Runnable runnable4RecvThread = new Runnable() {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    // 상대 데이터 수신
+                    int opponentDistance = inStream.readInt(); // 거리
+                    //int opponentGameState = inStream.readInt(); // 게임 상태
+                    // UI 업데이트
+                    runOnUiThread(() -> {
+                        updateOpponentPosition(opponentDistance); // 거리 업데이트
+                        //updateOpponentState(opponentGameState);   // 상태 반영
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    disconnectServer();
+                    break;
+                }
+            }
+        }
+    };
+    // 송신 스레드
+    private Runnable runnable4SendThread = new Runnable() {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    // 내 데이터 송신
+                    synchronized (socketReady) {
+                        if (outStream != null) {
+                            outStream.writeInt(player1Model.getCurrentDistance()); // 현재 거리
+                            //outStream.writeInt(getGameState());                    // 게임 상태
+                            //outStream.writeInt(player1Model.getHealth());          // 체력 상태
+                            outStream.flush();
+                        }
+                    }
+                    Thread.sleep(100); // 0.1초 간격
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    disconnectServer();
+                    break;
+                }
+            }
+        }
+    };
+    private void startThread(Runnable runnable) {
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        thread.start();
     }
 }
 

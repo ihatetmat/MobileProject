@@ -62,6 +62,7 @@ public class GameModel {
         Log.d("health", String.valueOf(health));
 
         if (health <= 0) {
+            isEnd = true;
             endGame();
         }
     }
@@ -223,11 +224,12 @@ public class GameModel {
         if (currentDistance > totalDistance) {
             currentDistance = totalDistance;
             isEnd = true;
+            endGame();
         }
         //gameController.updateDistance(currentDistance);
     }
     public boolean checkGameOver() {
-        return isEnd || currentDistance >= totalDistance;
+        return isEnd;
     }
 
     // 종민

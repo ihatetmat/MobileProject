@@ -12,8 +12,8 @@ import java.util.List;
 public class GameController {
 
     private int playerCount;
-    private ImageView player1View; //, player2View;
-    private GameModel player1Model; //, player2Model;
+    private ImageView playerView; //, player2View;
+    private GameModel playerModel; //, player2Model;
     private GameView gameView;
     private boolean isPaused = false;
     private boolean isJumping = false; // 점프 상태 관리
@@ -21,11 +21,12 @@ public class GameController {
     private Handler handler = new Handler();
     private Runnable gameLoop;
     private List<Obstacle> obstacles; // 장애물 목록
+    public GameState gameState = GameState.Initial;
 
     // 생성자: View와 Model 객체를 초기화
-    public GameController(ImageView player1View, GameModel player1Model,GameView gameView, int playerCount, List<Obstacle> obstacles) {
-        this.player1View = player1View;
-        this.player1Model = player1Model;
+    public GameController(ImageView playerView, GameModel playerModel,GameView gameView, int playerCount, List<Obstacle> obstacles) {
+        this.playerView = playerView;
+        this.playerModel = playerModel;
         this.playerCount = playerCount;
         this.gameView = gameView;
         this.obstacles = obstacles;
@@ -34,17 +35,6 @@ public class GameController {
             throw new IllegalArgumentException("playerCount 오류");
         }
     }
-    /*
-    public GameController(ImageView player1View, GameModel player1Model,
-                          ImageView player2View, GameModel player2Model) {
-        this.player1View = player1View;
-        this.player1Model = player1Model;
-        this.player2View = player2View;
-        this.player2Model = player2Model;
-        this.playerCount = 2;
-    }
-    */
-
     // 점프
     public void jumping() {
         if (isJumping||isSliding)
@@ -52,9 +42,8 @@ public class GameController {
         isJumping = true;
         gameView.jump();
 //        updateView(); // 점프 중 모션 적용했습니다.
-        player1Model.move(0, -200); // y축 위로 200 이동
+        playerModel.move(0, -200); // y축 위로 200 이동
         isJumping = false;
-
     }
 
     // 슬라이딩
@@ -71,6 +60,7 @@ public class GameController {
     public void pauseGame() {
         if (!isPaused) {
             isPaused = true;
+            gameState = GameState.Paused;
             handler.removeCallbacks(gameLoop); // 게임 루프 정지
             for (Obstacle obstacle : obstacles) {
                 obstacle.pause(); // 모든 장애물 정지
@@ -81,6 +71,7 @@ public class GameController {
     public void resumeGame() {
         if (isPaused) {
             isPaused = false;
+            gameState = GameState.Running;
             for (Obstacle obstacle : obstacles) {
                 obstacle.resume(); // 모든 장애물 이동
             }
@@ -88,49 +79,61 @@ public class GameController {
         }
     }
 
-
     // 게임 상태 업데이트
     private void updateGameState() {
         if (playerCount >= 1) {
-            player1Model.update();
-            updateView(player1View, player1Model);
+            playerModel.update();
         }
-        /*
-        if (playerCount == 2) {
-            player2Model.update();
-            updateView(player2View, player2Model);
-        }*/
-        // todo: 충돌, 종료 조건, 스코어 계산 등 추가
+        if (playerModel.checkGameOver()) {
+            endGame(); // 종료 처리
+        }
     }
-
-    private void updateView(ImageView view, GameModel model) {
-        //캐릭터 위치 설정
-        //
-    }
-
     // 게임 초기화
     public void resetGame() {
-        player1Model.reset();
-        /*
-        if (playerCount == 2) {
-            player2Model.reset();
-        }
-        */
-        updateView(player1View, player1Model);
-        /*
-        if (playerCount == 2) {
-            updateView(player2View, player2Model);
-        }*/
+        playerModel.reset();
     }
     public void moveCharacter(int distance){
-        player1Model.updateDistance(distance);
-        /*
-        if (playerCount==2){
-            player2Model.updateDistance(distance);
-        }*/
+        playerModel.updateDistance(distance);
     }
     public GameModel getGameModel() {
-        return player1Model; // GameModel 반환
+        return playerModel; // GameModel 반환
     }
-
+    public void endGame() {
+        // 필요한 게임 종료 처리
+        handler.removeCallbacks(gameLoop); // 게임 루프 종료
+        for (Obstacle obstacle : obstacles) {
+            obstacle.pause(); // 장애물 정지
+        }
+        // 게임 모델 및 뷰 초기화 및 종료 상태 표시
+        resetGame();
+        gameState = GameState.End; // 상태 변경
+        System.out.println("게임 종료");
+    }
+    // 게임 상태 관리 코드
+    public enum GameState {
+        Error(-1), Initial(0), Running(1), Paused(2), End(3);
+        private final int value;
+        private GameState(int value) {
+            this.value = value;
+        }
+        public int value() {
+            return value;
+        }
+        public static GameState stateFromInteger(int value) {
+            switch (value) {
+                case -1:
+                    return Error;
+                case 0:
+                    return Initial;
+                case 1:
+                    return Running;
+                case 2:
+                    return Paused;
+                case 3:
+                    return End;
+                default:
+                    return null;
+            }
+        }
+    }
 }
