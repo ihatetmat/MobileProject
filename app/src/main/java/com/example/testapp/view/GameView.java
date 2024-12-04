@@ -26,6 +26,13 @@ public class GameView extends View {
     Paint scorePaint;
     private boolean isPaused;
 
+    public Object getModel() {
+        return model;
+    }
+
+    public void resetGame() {
+    }
+
     public enum PlayerState {
         DEFAULT(0), JUMPING(1), SLIDING(2);
         private final int value;
