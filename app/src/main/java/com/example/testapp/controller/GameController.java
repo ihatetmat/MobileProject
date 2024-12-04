@@ -1,7 +1,6 @@
 package com.example.testapp.controller;
 
 import android.os.Handler;
-import android.widget.ImageView;
 
 import com.example.testapp.model.GameModel;
 import com.example.testapp.object.Obstacle;
@@ -12,7 +11,6 @@ import java.util.List;
 public class GameController {
 
     private int playerCount;
-    private ImageView playerView; //, player2View;
     private GameModel playerModel; //, player2Model;
     private GameView gameView;
     private boolean isPaused = false;
@@ -24,8 +22,7 @@ public class GameController {
     public GameState gameState = GameState.Initial;
 
     // 생성자: View와 Model 객체를 초기화
-    public GameController(ImageView playerView, GameModel playerModel,GameView gameView, int playerCount, List<Obstacle> obstacles) {
-        this.playerView = playerView;
+    public GameController(GameModel playerModel, GameView gameView, int playerCount, List<Obstacle> obstacles) {
         this.playerModel = playerModel;
         this.playerCount = playerCount;
         this.gameView = gameView;

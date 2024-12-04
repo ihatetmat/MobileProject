@@ -17,18 +17,12 @@ import com.example.testapp.object.Obstacle;
 import java.util.List;
 
 public class GameView extends View {
-    private int playerCount; // 플레이어 수
-    private Paint paintPlayer1; // 플레이어 1의 Paint 객체
-    private Paint paintPlayer2; // 플레이어 2의 Paint 객체
     private GameModel model; // 게임 모델 객체
-    private ImageView player;
+    private ImageView playerView;
     private PlayerState playerState;
-    private int initialState = 1;
-    private int hearts = 3; // 하트 개수
+    private int hearts; // 하트 개수
     private Bitmap obstacleBitmap;
     private Bitmap heartBitmap;
-    private List<Bitmap> scaledObstacles;
-    private List<Bitmap> scaledHearts;
     Paint scorePaint;
 
     public enum PlayerState {
@@ -39,22 +33,11 @@ public class GameView extends View {
     }
 
     // 생성자: 단일/다중 플레이어 설정
-    public GameView(Context context, int playerCount, GameModel gameModel, ImageView player) {
+    public GameView(Context context, GameModel gameModel, ImageView player) {
         super(context);
-        this.playerCount = playerCount;
         this.model = gameModel;
-        this.player = player;
+        this.playerView = player;
         this.playerState = PlayerState.DEFAULT;
-
-        // 각 플레이어의 색상 설정
-        paintPlayer1 = new Paint();
-        paintPlayer1.setColor(Color.BLUE);
-
-        if (playerCount > 1) {
-            paintPlayer2 = new Paint();
-            paintPlayer2.setColor(Color.RED);
-        }
-
         scorePaint = new Paint();
         scorePaint.setColor(Color.BLACK);
         scorePaint.setTextSize(60);
@@ -88,8 +71,8 @@ public class GameView extends View {
                 // 장애물이 화면 밖으로 나가면 재배치
                 if (obstacle.getX() + obstacle.getWidth() < 0) {
                     obstacle.setX(getWidth());
-                    int playerTop = player.getTop();
-                    int playerHeight = player.getHeight();
+                    int playerTop = playerView.getTop();
+                    int playerHeight = playerView.getHeight();
                     int obstacleY = (int) (Math.random() * 2) == 0
                             ? playerTop + (playerHeight / 2)
                             : playerTop - obstacle.getHeight() + 50;
@@ -114,11 +97,11 @@ public class GameView extends View {
 
             // 캐릭터 상태 처리
             if (playerState == PlayerState.DEFAULT) {
-                player.setImageResource(R.drawable.character_image);
+                playerView.setImageResource(R.drawable.character_image);
             } else if (playerState == PlayerState.JUMPING) {
-                player.setImageResource(R.drawable.character_jump);
+                playerView.setImageResource(R.drawable.character_jump);
             } else if (playerState == PlayerState.SLIDING) {
-                player.setImageResource(R.drawable.character_slide);
+                playerView.setImageResource(R.drawable.character_slide);
             }
 
             // 점수 표시
@@ -134,11 +117,11 @@ public class GameView extends View {
         if (playerState == PlayerState.DEFAULT) {
             playerState = PlayerState.JUMPING;
 
-            player.animate()
+            playerView.animate()
                     .translationYBy(-300f)
                     .setDuration(200)
                     .withEndAction(() -> {
-                        player.animate()
+                        playerView.animate()
                                 .translationYBy(300f)
                                 .setDuration(200)
                                 .withEndAction(() -> {
@@ -156,7 +139,7 @@ public class GameView extends View {
 
             model.move(0, 50);
 
-            player.postDelayed(() -> {
+            playerView.postDelayed(() -> {
                 invalidateView(PlayerState.DEFAULT);
                 model.move(0, -50);
             }, 300);

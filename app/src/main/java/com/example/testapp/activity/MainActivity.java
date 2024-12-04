@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private Button jumpButton, slideButton, pauseButton, resumeButton;
     private GameController gameController;
     private GameModel player1Model;
-    private GameView gameView;
+    private GameView player1View;
     private FrameLayout overlay;
     private int playerCount;
     private View characterPosition;
@@ -94,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
         player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
-        gameView = new GameView(this, playerCount, player1Model, character);
-        gameController = new GameController(character, player1Model, gameView, playerCount, obstacles);
+        player1View = new GameView(this, player1Model, character);
+        gameController = new GameController(player1Model, player1View, playerCount, obstacles);
 
         // 레이아웃 완료 후 위치 가져오기
         character.post(() -> {
@@ -106,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
         // shkim
         // GameView 생성 및 추가
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
-        gameContainer.addView(gameView);
-        gameView.invalidate();
+        gameContainer.addView(player1View);
+        player1View.invalidate();
 
         startGameLoop();
         // shkim
