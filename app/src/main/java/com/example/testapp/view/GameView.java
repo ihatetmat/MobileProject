@@ -24,6 +24,7 @@ public class GameView extends View {
     private Bitmap obstacleBitmap;
     private Bitmap heartBitmap;
     Paint scorePaint;
+    private boolean isPaused;
 
     public enum PlayerState {
         DEFAULT(0), JUMPING(1), SLIDING(2);
@@ -64,25 +65,33 @@ public class GameView extends View {
         if (model != null) {
             hearts = model.getPlayerHealth();
             List<Obstacle> obstacles = model.getObstacles();
-            for (Obstacle obstacle : obstacles) {
-                // 장애물 X 좌표 이동 (속도 300px/초로 고정)
-                obstacle.setX((int) (obstacle.getX() - 500 * deltaTime));
-
-                // 장애물이 화면 밖으로 나가면 재배치
-                if (obstacle.getX() + obstacle.getWidth() < 0) {
-                    obstacle.setX(getWidth());
-                    int playerTop = playerView.getTop();
-                    int playerHeight = playerView.getHeight();
-                    int obstacleY = (int) (Math.random() * 2) == 0
-                            ? playerTop + (playerHeight / 2)
-                            : playerTop - obstacle.getHeight() + 50;
-
-                    obstacle.setY(obstacleY);
+            if (isPaused) {
+                for (Obstacle obstacle : obstacles) {
+                    Bitmap scaledObstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
+                    canvas.drawBitmap(scaledObstacleBitmap, obstacle.getX(), obstacle.getY(), null);
                 }
+            }
+            else {
+                for (Obstacle obstacle : obstacles) {
+                    // 장애물 X 좌표 이동 (속도 300px/초로 고정)
+                    obstacle.setX((int) (obstacle.getX() - 500 * deltaTime));
 
-                // Bitmap 최적화
-                Bitmap scaledObstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
-                canvas.drawBitmap(scaledObstacleBitmap, obstacle.getX(), obstacle.getY(), null);
+                    // 장애물이 화면 밖으로 나가면 재배치
+                    if (obstacle.getX() + obstacle.getWidth() < 0) {
+                        obstacle.setX(getWidth());
+                        int playerTop = playerView.getTop();
+                        int playerHeight = playerView.getHeight();
+                        int obstacleY = (int) (Math.random() * 2) == 0
+                                ? playerTop + (playerHeight / 2)
+                                : playerTop - obstacle.getHeight() + 50;
+
+                        obstacle.setY(obstacleY);
+                    }
+
+                    // Bitmap 최적화
+                    Bitmap scaledObstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, obstacle.getWidth(), obstacle.getHeight(), false);
+                    canvas.drawBitmap(scaledObstacleBitmap, obstacle.getX(), obstacle.getY(), null);
+                }
             }
 
             // 하트 그리기
@@ -150,6 +159,11 @@ public class GameView extends View {
     public void invalidateView(PlayerState playerState) {
         this.playerState = playerState;
         invalidate(); // onDraw 호출
-    }}
+    }
+
+    public void setPause(boolean value) {
+        this.isPaused = value;
+    }
+}
 
 

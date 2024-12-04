@@ -38,7 +38,6 @@ public class GameController {
             return; // 점프 및 슬라이딩 중이면 점프 방지
         isJumping = true;
         gameView.jump();
-//        updateView(); // 점프 중 모션 적용했습니다.
         playerModel.move(0, -200); // y축 위로 200 이동
         isJumping = false;
     }
@@ -49,7 +48,6 @@ public class GameController {
             return; // 슬라이딩 중 및 점프 중이면 점프 방지
         isSliding = true; // 슬라이딩 상태 시작
         gameView.slide();
-//        updateView(); // 슬라이드 이미지 적용
         isSliding = false;
     }
 
@@ -58,6 +56,7 @@ public class GameController {
         if (!isPaused) {
             isPaused = true;
             gameState = GameState.Paused;
+            gameView.setPause(true);
             handler.removeCallbacks(gameLoop); // 게임 루프 정지
             for (Obstacle obstacle : obstacles) {
                 obstacle.pause(); // 모든 장애물 정지
@@ -69,6 +68,7 @@ public class GameController {
         if (isPaused) {
             isPaused = false;
             gameState = GameState.Running;
+            gameView.setPause(false);
             for (Obstacle obstacle : obstacles) {
                 obstacle.resume(); // 모든 장애물 이동
             }
