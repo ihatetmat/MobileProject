@@ -11,7 +11,7 @@ import java.util.List;
 public class GameController {
 
     private int playerCount;
-    private GameModel playerModel; //, player2Model;
+    private GameModel playerModel;
     private GameView gameView;
     private boolean isPaused = false;
     private boolean isJumping = false; // 점프 상태 관리

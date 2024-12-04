@@ -13,13 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 public class GameModel {
-
-    private int playerCount; // 플레이어 수
-    private float character1X, character1Y; // 플레이어 1의 좌표
-    private float character1Width, character1Height;
-    private float character2X, character2Y; // 플레이어 2의 좌표 (2인용)
+    private float characterX, characterY; // 플레이어 1의 좌표
+    private float characterWidth, characterHeight;
     private List<Obstacle> obstacles;
-    private int score1, score2; // 각 플레이어의 점수
+    private int score; // 각 플레이어의 점수
     private int playerHealth = 3; // 플레이어 체력
     private String gameState; // 게임 상태
     private int totalDistance = 1000; // todo: 아직 예상이여서 추후에 정확한 값 정하기
@@ -29,18 +26,12 @@ public class GameModel {
     private boolean isEnd;
 
     // 생성자: 1인용 또는 2인용 초기화
-    public GameModel(Context context, int playerCount) {
-        this.playerCount = playerCount;
+    public GameModel(Context context) {
         // todo: 초기 위치는 임시로 설정했습니다.
-        this.character1X = 0;
-        this.character1Y = 0;
-        if (playerCount == 2) {
-            this.character2X = 0;
-            this.character2Y = 0;
-        }
+        this.characterX = 0;
+        this.characterY = 0;
         this.obstacles = new ArrayList<>();
-        this.score1 = 0;
-        this.score2 = 0;
+        this.score = 0;
         this.gameState = "시작";
         this.isEnd = false;
     }
@@ -69,10 +60,10 @@ public class GameModel {
 
     public boolean detectCollision() {
         // 캐릭터 경계 사각형 계산
-        float charLeft = this.character1X - (this.character1Width / 2.0f);
-        float charTop = this.character1Y - (this.character1Height / 2.0f);
-        float charRight = this.character1X + (this.character1Width / 2.0f);
-        float charBottom = this.character1Y + (this.character1Height / 2.0f);
+        float charLeft = this.characterX - (this.characterWidth / 2.0f);
+        float charTop = this.characterY - (this.characterHeight / 2.0f);
+        float charRight = this.characterX + (this.characterWidth / 2.0f);
+        float charBottom = this.characterY + (this.characterHeight / 2.0f);
 
         for (Obstacle obstacle : this.obstacles) {
             // 장애물 경계 사각형 계산
@@ -97,26 +88,15 @@ public class GameModel {
         // 게임 종료 로직
     }
 
-    // 플레이어 이동
-    public void movePlayer(int player, int dx, int dy) {
-        if (player == 1) {
-            character1X += dx;
-            character1Y += dy;
-        } else if (player == 2 && playerCount == 2) {
-            character2X += dx;
-            character2Y += dy;
-        }
-    }
-
     // 특정 플레이어 위치 이동
     public void move(float dx, float dy) {
-        this.character1X += dx;
-        this.character1Y += dy;
+        this.characterX += dx;
+        this.characterY += dy;
     }
 
     public void setWidthAndHeight(float width, float height) {
-        this.character1Width = width;
-        this.character1Height = height;
+        this.characterWidth = width;
+        this.characterHeight = height;
     }
 
     // 장애물 추가
@@ -165,35 +145,18 @@ public class GameModel {
     }
     // 상태 초기화
     public void reset() {
-        this.character1X = 100;
-        this.character1Y = 500;
-        if (playerCount == 2) {
-            this.character2X = 100;
-            this.character2Y = 500;
-        }
-        this.score1 = 0;
-        this.score2 = 0;
+        this.characterX = 100;
+        this.characterY = 500;
+        this.score = 0;
         this.obstacles.clear();
     }
     public void update() {
         // todo: 움직이는 거리는 정해지는 대로 바꾸기
         updateDistance(10); // 임시 거리 설정
     }
-    // Getter 및 Setter
-    public float getPlayer1X() {
-        return character1X;
-    }
-    public float getPlayer1Y() {
-        return character1Y;
-    }
-    public float getPlayer2X() {
-        return character2X;
-    }
-    public float getPlayer2Y() {
-        return character2Y;
-    }
-    public int getScore1() {
-        return this.score1;
+
+    public int getScore() {
+        return this.score;
     }
 
     public List<Obstacle> getObstacles() {

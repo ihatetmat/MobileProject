@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         resumeButton.setOnClickListener(onClickListener);
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
-        player1Model = new GameModel(this, playerCount); // 캐릭터 초기 위치
+        player1Model = new GameModel(this); // 캐릭터 초기 위치
         player1View = new GameView(this, player1Model, character);
         gameController = new GameController(player1Model, player1View, playerCount, obstacles);
 

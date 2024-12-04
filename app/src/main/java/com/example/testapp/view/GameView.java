@@ -105,7 +105,7 @@ public class GameView extends View {
             }
 
             // 점수 표시
-            canvas.drawText("Score: " + model.getScore1(), 50, 100, scorePaint);
+            canvas.drawText("Score: " + model.getScore(), 50, 100, scorePaint);
 
             // 일정 시간 간격으로 화면 다시 그리기
             invalidate();
