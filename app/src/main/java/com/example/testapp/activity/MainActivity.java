@@ -280,11 +280,21 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // 상대 데이터 수신
                     int opponentDistance = inStream.readInt(); // 거리
-                    //int opponentGameState = inStream.readInt(); // 게임 상태
+                    int gameResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
                     // UI 업데이트
                     runOnUiThread(() -> {
                         updateOpponentPosition(opponentDistance); // 거리 업데이트
-                        //updateOpponentState(opponentGameState);   // 상태 반영
+                        if (gameResult == 1) {
+                            showGameResult("승리하였습니다!");
+                            endGame();
+                        } else if (gameResult == 2) {
+                            showGameResult("패배하였습니다.");
+                            endGame();
+                        } else if (gameResult == 3) {
+                            showGameResult("무승부입니다.");
+                            endGame();
+                        }
+                        
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -294,18 +304,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    // 송신 스레드
+    // 전송 스레드
     private Runnable runnable4SendThread = new Runnable() {
         @Override
         public void run() {
             while (true) {
                 try {
-                    // 내 데이터 송신
+                    // 내 데이터 전송
                     synchronized (socketReady) {
                         if (outStream != null) {
-                            outStream.writeInt(player1Model.getCurrentDistance()); // 현재 거리
-                            //outStream.writeInt(getGameState());                    // 게임 상태
-                            //outStream.writeInt(player1Model.getHealth());          // 체력 상태
+                            outStream.writeInt(player1Model.getCurrentDistance());        // 현재 거리 송신
+                            outStream.writeInt(player1Model.getHealth());                 // 현재 체력 상태 송신
+                            outStream.writeInt(player1Model.checkGameOver()? 1 : 0);      // 현재 게임 상태 송신
                             outStream.flush();
                         }
                     }
@@ -323,5 +333,16 @@ public class MainActivity extends AppCompatActivity {
         thread.setDaemon(true);
         thread.start();
     }
+    // UI에 결과 메시지 출력
+    private void showGameResult(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+    // 2인용 게임 종료 로직
+    private void endGame() {
+        handler.removeCallbacks(updateRunnable);
+        disconnectServer();
+        finish(); // 현재 Activity 종료
+    }
+
 }
 
