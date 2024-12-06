@@ -54,7 +54,7 @@ public class GameModel {
 
         if (health <= 0) {
             isEnd = true;
-            endGame();
+            //endGame();
         }
     }
 
@@ -165,10 +165,6 @@ public class GameModel {
         this.score = 0;
         this.obstacles.clear();
     }
-    public void update() {
-        // todo: 움직이는 거리는 정해지는 대로 바꾸기
-        updateDistance(10); // 임시 거리 설정
-    }
 
     public int getScore() {
         return this.score;
@@ -197,12 +193,20 @@ public class GameModel {
     public int getCurrentDistance(){
         return currentDistance;
     }
+    public void update() {
+        // todo: 움직이는 거리는 정해지는 대로 바꾸기
+        updateDistance(1); // 임시 거리 설정
+        if (playerHealth <= 0) {
+            isEnd = true;
+            //endGame();
+        }
+    }
     public void updateDistance(int distance) {
         currentDistance += distance;
         if (currentDistance > totalDistance) {
             currentDistance = totalDistance;
             isEnd = true;
-            endGame();
+            //endGame();
         }
         //gameController.updateDistance(currentDistance);
     }
@@ -214,4 +218,4 @@ public class GameModel {
     }
 
     // 종민
-    }
+}
