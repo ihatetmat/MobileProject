@@ -19,7 +19,7 @@ public class GameController {
     private Handler handler = new Handler();
     private Runnable gameLoop;
     private List<Obstacle> obstacles; // 장애물 목록
-    public GameState gameState = GameState.Initial;
+    private GameState gameState = GameState.Initial;
 
     // 생성자: View와 Model 객체를 초기화
     public GameController(GameModel playerModel, GameView gameView, int playerCount, List<Obstacle> obstacles) {
@@ -28,9 +28,6 @@ public class GameController {
         this.gameView = gameView;
         this.obstacles = obstacles;
 
-//        if (playerCount != 1) {
-//            throw new IllegalArgumentException("playerCount 오류");
-//        }
     }
     // 점프
     public void jumping() {
@@ -77,10 +74,8 @@ public class GameController {
     }
 
     // 게임 상태 업데이트
-    private void updateGameState() {
-        if (playerCount >= 1) {
-            playerModel.update();
-        }
+    public void updateGameState() {
+        playerModel.update();
         if (playerModel.checkGameOver()) {
             endGame(); // 종료 처리
         }
@@ -88,9 +83,6 @@ public class GameController {
     // 게임 초기화
     public void resetGame() {
         playerModel.reset();
-    }
-    public void moveCharacter(int distance){
-        playerModel.updateDistance(distance);
     }
     public GameModel getGameModel() {
         return playerModel; // GameModel 반환
@@ -132,5 +124,9 @@ public class GameController {
                     return null;
             }
         }
+    }
+    // GameState 반환 함수
+    public GameState getGameState() {
+        return gameState;
     }
 }

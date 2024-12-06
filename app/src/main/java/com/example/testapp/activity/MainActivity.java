@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
-        //todo: 2인용인 경우 1인용인 경우 기능 추가
         // 장애물 리스트 생성
         List<Obstacle> obstacles = new ArrayList<>();
         // 캐릭터 및 버튼 초기화
@@ -109,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
         gameContainer.addView(player1View);
         player1View.invalidate();
-
+        //jmgeum
         startGameLoop();
         // shkim
         // 충돌 검사 Runnable 설정
@@ -128,6 +127,19 @@ public class MainActivity extends AppCompatActivity {
         updateRunnable = new Runnable() {
             @Override
             public void run() {
+                // 캐릭터 업데이트
+                gameController.getGameModel().update();
+                gameController.updateGameState();
+
+                // 종료조건 확인
+                GameController.GameState gameState = gameController.getGameState();
+                if (gameState == GameController.GameState.End) {
+                    // GameState가 'End'일 경우 게임 종료
+                    Toast.makeText(MainActivity.this, "게임 종료!", Toast.LENGTH_LONG).show();
+                    finish(); // 액티비티 종료
+                    return;
+                }
+
                 // 캐릭터 위치 업데이트
                 updateCharacterPosition();
                 handler.postDelayed(this, 100); // 0.1초마다 갱신
@@ -299,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
                             showGameResult("무승부입니다.");
                             endGame();
                         }
-                        
+
                     });
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -350,4 +362,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-
