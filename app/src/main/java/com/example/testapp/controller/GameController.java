@@ -28,9 +28,9 @@ public class GameController {
         this.gameView = gameView;
         this.obstacles = obstacles;
 
-        if (playerCount != 1) {
-            throw new IllegalArgumentException("playerCount 오류");
-        }
+//        if (playerCount != 1) {
+//            throw new IllegalArgumentException("playerCount 오류");
+//        }
     }
     // 점프
     public void jumping() {

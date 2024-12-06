@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private DataInputStream inStream = null;
     private Object socketReady = new Object();
     private Object inStreamReady = new Object();
-    private final String serverHost = "서버 IP주소"; // 서버 IP 주소
+    private final String serverHost = "10.0.2.2"; // 서버 IP 주소
     private final int serverPort = 9999; // 서버 포트 번호
 
     @Override
@@ -134,18 +134,22 @@ public class MainActivity extends AppCompatActivity {
         };
         handler.post(updateRunnable);
         // 2인용인 경우 송수신 스레드 실행
+        // startGameLoop() 메서드 내
         if (playerCount == 2) {
-            // 서버 연결
-            boolean isConnected = connectServer();
-            if (!isConnected) {
-                Toast.makeText(this, "서버 연결 실패", Toast.LENGTH_SHORT).show();
-                finish(); // 연결 실패 시 종료
-                return;
-            }
-
-            // 수신 및 송신 스레드 시작
-            startThread(runnable4RecvThread);
-            startThread(runnable4SendThread);
+            // 서버 연결을 별도의 스레드에서 실행
+            new Thread(() -> {
+                boolean isConnected = connectServer();
+                runOnUiThread(() -> { // UI 작업은 메인 스레드에서 실행
+                    if (!isConnected) {
+                        Toast.makeText(MainActivity.this, "서버 연결 실패", Toast.LENGTH_SHORT).show();
+                        finish(); // 연결 실패 시 종료
+                    } else {
+                        // 수신 및 송신 스레드 시작
+                        startThread(runnable4RecvThread);
+                        startThread(runnable4SendThread);
+                    }
+                });
+            }).start();
         }
     }
 
