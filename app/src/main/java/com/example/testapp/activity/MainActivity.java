@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         character.post(() -> {
             player1Model.move((character.getX() + (character.getWidth() / 2)), (character.getY() + (character.getHeight() / 2)));
             player1Model.setWidthAndHeight((character.getWidth() / 2), (character.getHeight() / 2));
+            player1Model.generateRandomObstacles(5, 400, character);
         });
 
         // shkim

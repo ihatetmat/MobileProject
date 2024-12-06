@@ -121,25 +121,19 @@ public class GameModel {
 
     public void generateRandomObstacles(
             int obstacleCount,
-            int screenWidth,
-            int screenHeight,
-            int groundHeight,
-            int minGap,
-            int maxGap,
+            int gap,
             ImageView character
     ) {
         Random random = new Random();
         obstacles.clear();
 
         // 땅의 Y 좌표를 기준으로 계산
-        int groundY = screenHeight - groundHeight; // 땅의 높이 기준
-        int previousX = (int) (character.getX() + character.getWidth()) + 100; // 캐릭터 끝 지점부터 시작
+        int groundY = (int) (character.getY() + character.getHeight()); // 땅의 높이 기준
+        int previousX = (int) (character.getX() + character.getWidth()) + gap; // 캐릭터 끝 지점부터 시작
 
         for (int i = 0; i < obstacleCount; i++) {
             int width = random.nextInt(50) + 50; // 장애물 너비 (50~100)
             int height = random.nextInt(50) + 50; // 장애물 높이 (50~100)
-            int gap = random.nextInt(maxGap - minGap + 1) + minGap; // 장애물 간 간격
-
             // 장애물의 X 좌표는 이전 장애물의 끝 지점 + 간격
             int x = previousX + gap;
 
@@ -147,7 +141,7 @@ public class GameModel {
             int y = groundY - height;
 
             addObstacle(x, y, width, height);
-            previousX = x; // 현재 장애물의 끝 지점을 다음 계산을 위해 저장
+            previousX = x;
         }
     }
     // 장애물 제거

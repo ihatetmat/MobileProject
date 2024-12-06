@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -25,6 +27,7 @@ public class GameView extends View {
     private Bitmap heartBitmap;
     Paint scorePaint;
     private boolean isPaused;
+    Handler handler = new Handler();
 
     public Object getModel() {
         return model;
@@ -51,7 +54,6 @@ public class GameView extends View {
         scorePaint.setTextSize(60);
         heartBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.heart);
         obstacleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.obstacle_image);
-        model.generateRandomObstacles(5, getWidth(), getHeight(), 100, 300, 500, player);
     }
 
     // XML 레이아웃 파일에서 사용하는 기본 생성자
@@ -85,14 +87,18 @@ public class GameView extends View {
 
                     // 장애물이 화면 밖으로 나가면 재배치
                     if (obstacle.getX() + obstacle.getWidth() < 0) {
-                        obstacle.setX(getWidth());
-                        int playerTop = playerView.getTop();
-                        int playerHeight = playerView.getHeight();
-                        int obstacleY = (int) (Math.random() * 2) == 0
-                                ? playerTop + (playerHeight / 2)
-                                : playerTop - obstacle.getHeight() + 50;
+                        handler.postDelayed(() -> {
+                            obstacle.setX(getWidth());
 
-                        obstacle.setY(obstacleY);
+                            int playerTop = playerView.getTop();
+                            int playerHeight = playerView.getHeight();
+                            int obstacleY = (int) (Math.random() * 2) == 0
+                                    ? playerTop + (playerHeight / 2)
+                                    : playerTop - obstacle.getHeight() + 50;
+
+                            obstacle.setY(obstacleY);
+                            Log.d("asd", String.valueOf((int) (obstacle.getX() - 500 * deltaTime)));
+                        }, (int) (obstacle.getX() - 500 * deltaTime));
                     }
 
                     // Bitmap 최적화
