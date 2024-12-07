@@ -80,25 +80,6 @@ public class GameModel {
         return false; // 충돌 없음
     }
 
-    private OnGameEndListener gameEndListener;
-
-    // 리스너 인터페이스 정의
-    public interface OnGameEndListener {
-        void onGameEnd();
-    }
-
-    // 리스너 설정 메서드
-    public void setOnGameEndListener(OnGameEndListener listener) {
-        this.gameEndListener = listener;
-    }
-
-    private void endGame() {
-        // 게임 종료 로직
-        if (gameEndListener != null) {
-            gameEndListener.onGameEnd();
-        }
-    }
-
     // 특정 플레이어 위치 이동
     public void move(float dx, float dy) {
         this.characterX += dx;
@@ -172,7 +153,6 @@ public class GameModel {
         updateDistance(1); // 임시 거리 설정
         if (playerHealth <= 0) {
             isEnd = true;
-            //endGame();
         }
     }
     public void updateDistance(int distance) {
@@ -180,9 +160,7 @@ public class GameModel {
         if (currentDistance > totalDistance) {
             currentDistance = totalDistance;
             isEnd = true;
-            //endGame();
         }
-        //gameController.updateDistance(currentDistance);
     }
     public boolean checkGameOver() {
         return isEnd;
