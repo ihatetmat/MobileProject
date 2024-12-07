@@ -111,7 +111,7 @@ public class GameModel {
     }
 
     // 장애물 추가
-    public void addObstacle(int x, int y, int width, int height) {
+    private void addObstacle(int x, int y, int width, int height) {
         obstacles.add(new Obstacle(x, y, width, height));
     }
 
