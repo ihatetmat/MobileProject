@@ -54,7 +54,7 @@ public class GameModel {
         }
     }
 
-    public boolean detectCollision() {
+    private boolean detectCollision() {
         // 캐릭터 경계 사각형 계산
         float charLeft = this.characterX - (this.characterWidth / 2.0f);
         float charTop = this.characterY - (this.characterHeight / 2.0f);
