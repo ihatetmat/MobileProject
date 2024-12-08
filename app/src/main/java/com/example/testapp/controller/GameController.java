@@ -55,9 +55,6 @@ public class GameController {
             gameState = GameState.Paused;
             gameView.setPause(true);
             handler.removeCallbacks(gameLoop); // 게임 루프 정지
-            for (Obstacle obstacle : obstacles) {
-                obstacle.pause(); // 모든 장애물 정지
-            }
         }
     }
     // 게임 재게
@@ -66,9 +63,6 @@ public class GameController {
             isPaused = false;
             gameState = GameState.Running;
             gameView.setPause(false);
-            for (Obstacle obstacle : obstacles) {
-                obstacle.resume(); // 모든 장애물 이동
-            }
             handler.post(gameLoop); // 게임 루프 재개
         }
     }
@@ -90,9 +84,6 @@ public class GameController {
     public void endGame() {
         // 필요한 게임 종료 처리
         handler.removeCallbacks(gameLoop); // 게임 루프 종료
-        for (Obstacle obstacle : obstacles) {
-            obstacle.pause(); // 장애물 정지
-        }
         // 게임 모델 및 뷰 초기화 및 종료 상태 표시
         resetGame();
         gameState = GameState.End; // 상태 변경
