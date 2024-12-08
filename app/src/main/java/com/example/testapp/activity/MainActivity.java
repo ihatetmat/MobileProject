@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         gameContainer.addView(playerView);
         playerView.invalidate();
         //jmgeum
+        gameController.startGame();
         startGameLoop();
         // shkim
         // 충돌 검사 Runnable 설정
@@ -140,8 +141,11 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // 캐릭터 위치 업데이트
-                updateCharacterPosition();
+                // 캐릭터 위치 업데이트 (Running 상태일 때만 실행)
+                if (gameState == GameController.GameState.Running) {
+                    updateCharacterPosition();
+                }
+
                 handler.postDelayed(this, 100); // 0.1초마다 갱신
             }
         };

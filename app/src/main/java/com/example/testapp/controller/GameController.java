@@ -42,6 +42,9 @@ public class GameController {
         isSliding = false;
     }
 
+    public void startGame(){
+        gameState = GameState.Running;
+    }
     // 게임 일시정지
     public void pauseGame() {
         if (!isPaused) {
@@ -63,7 +66,9 @@ public class GameController {
 
     // 게임 상태 업데이트
     public void updateGameState() {
-        playerModel.update();
+        if(gameState == GameState.Running){
+            playerModel.update();
+        }
         if (playerModel.checkGameOver()) {
             endGame(); // 종료 처리
         }
