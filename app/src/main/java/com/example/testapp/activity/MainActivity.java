@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
                     synchronized (socketReady) {
                         if (outStream != null) {
                             outStream.writeInt(player1Model.getCurrentDistance());        // 현재 거리 송신
-                            outStream.writeInt(player1Model.getHealth());                 // 현재 체력 상태 송신
+                            outStream.writeInt(player1Model.getPlayerHealth());                 // 현재 체력 상태 송신
                             outStream.writeInt(player1Model.checkGameOver()? 1 : 0);      // 현재 게임 상태 송신
                             outStream.flush();
                         }

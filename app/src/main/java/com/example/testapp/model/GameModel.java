@@ -165,9 +165,5 @@ public class GameModel {
     public boolean checkGameOver() {
         return isEnd;
     }
-    public int getHealth(){
-        return playerHealth;
-    }
-
     // 종민
 }
