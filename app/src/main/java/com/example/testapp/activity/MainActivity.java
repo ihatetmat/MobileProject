@@ -17,15 +17,12 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.testapp.R;
 import com.example.testapp.controller.GameController;
 import com.example.testapp.model.GameModel;
-import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,9 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private View progressLine;
     private Runnable updateRunnable;
     private Handler handler = new Handler();
-    private static final float CHARACTER_SPEED = 7.0f;
     private Runnable collisionCheckRunnable;
-    private Runnable checkState;
     private Socket socket = null;
     private final int maxWaitingTime = 3000; // 3 초 대기
     private DataOutputStream outStream = null;
@@ -66,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
         // 2인용 여부 확인
         // Intent에서 플레이어 수 전달받기
         playerCount = getIntent().getIntExtra("playerCount", 1);
-        // 장애물 리스트 생성
-        List<Obstacle> obstacles = new ArrayList<>();
         // 캐릭터 및 버튼 초기화
         character = findViewById(R.id.character);
         jumpButton = findViewById(R.id.jumpButton);
