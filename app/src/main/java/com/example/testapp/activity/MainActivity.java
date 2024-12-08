@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView character;
     private Button jumpButton, slideButton, pauseButton, resumeButton;
     private GameController gameController;
-    private GameModel player1Model;
-    private GameView player1View;
+    private GameModel playerModel;
+    private GameView playerView;
     private FrameLayout overlay;
     private int playerCount;
     private View characterPosition;
@@ -92,22 +92,22 @@ public class MainActivity extends AppCompatActivity {
         resumeButton.setOnClickListener(onClickListener);
 
         // GameController 생성 todo : 초기 위치 설정해야 할듯?
-        player1Model = new GameModel(this); // 캐릭터 초기 위치
-        player1View = new GameView(this, player1Model, character);
-        gameController = new GameController(player1Model, player1View, playerCount, obstacles);
+        playerModel = new GameModel(this); // 캐릭터 초기 위치
+        playerView = new GameView(this, playerModel, character);
+        gameController = new GameController(playerModel, playerView, playerCount);
 
         // 레이아웃 완료 후 위치 가져오기
         character.post(() -> {
-            player1Model.move((character.getX() + (character.getWidth() / 2)), (character.getY() + (character.getHeight() / 2)));
-            player1Model.setWidthAndHeight((character.getWidth() / 2), (character.getHeight() / 2));
-            player1Model.generateRandomObstacles(5, 400, character);
+            playerModel.move((character.getX() + (character.getWidth() / 2)), (character.getY() + (character.getHeight() / 2)));
+            playerModel.setWidthAndHeight((character.getWidth() / 2), (character.getHeight() / 2));
+            playerModel.generateRandomObstacles(5, 400, character);
         });
 
         // shkim
         // GameView 생성 및 추가
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
-        gameContainer.addView(player1View);
-        player1View.invalidate();
+        gameContainer.addView(playerView);
+        playerView.invalidate();
         //jmgeum
         startGameLoop();
         // shkim
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         collisionCheckRunnable = new Runnable() {
             @Override
             public void run() {
-                player1Model.checkCollisions();
+                playerModel.checkCollisions();
                 handler.postDelayed(this, 16);
             }
         };
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 GameController.GameState gameState = gameController.getGameState();
                 if (gameState == GameController.GameState.End) {
                     // GameState가 'End'일 경우 게임 종료
-                    Toast.makeText(MainActivity.this, "게임 종료!", Toast.LENGTH_LONG).show();
+                    gameController.endGame();
                     finish(); // 액티비티 종료
                     return;
                 }
@@ -330,9 +330,9 @@ public class MainActivity extends AppCompatActivity {
                     // 내 데이터 전송
                     synchronized (socketReady) {
                         if (outStream != null) {
-                            outStream.writeInt(player1Model.getCurrentDistance());        // 현재 거리 송신
-                            outStream.writeInt(player1Model.getPlayerHealth());                 // 현재 체력 상태 송신
-                            outStream.writeInt(player1Model.checkGameOver()? 1 : 0);      // 현재 게임 상태 송신
+                            outStream.writeInt(playerModel.getCurrentDistance());        // 현재 거리 송신
+                            outStream.writeInt(playerModel.getPlayerHealth());                 // 현재 체력 상태 송신
+                            outStream.writeInt(playerModel.checkGameOver()? 1 : 0);      // 현재 게임 상태 송신
                             outStream.flush();
                         }
                     }

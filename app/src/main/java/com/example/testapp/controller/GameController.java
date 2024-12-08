@@ -3,31 +3,25 @@ package com.example.testapp.controller;
 import android.os.Handler;
 
 import com.example.testapp.model.GameModel;
-import com.example.testapp.object.Obstacle;
 import com.example.testapp.view.GameView;
-
-import java.util.List;
 
 public class GameController {
 
-    private int playerCount;
+    private int playerCount; // 플레이어 수
     private GameModel playerModel;
     private GameView gameView;
-    private boolean isPaused = false;
+    private boolean isPaused = false; // Pause 기능 관리
     private boolean isJumping = false; // 점프 상태 관리
     private boolean isSliding = false; // 슬라이딩 상태 관리
     private Handler handler = new Handler();
     private Runnable gameLoop;
-    private List<Obstacle> obstacles; // 장애물 목록
     private GameState gameState = GameState.Initial;
 
     // 생성자: View와 Model 객체를 초기화
-    public GameController(GameModel playerModel, GameView gameView, int playerCount, List<Obstacle> obstacles) {
+    public GameController(GameModel playerModel, GameView gameView, int playerCount) {
         this.playerModel = playerModel;
         this.playerCount = playerCount;
         this.gameView = gameView;
-        this.obstacles = obstacles;
-
     }
     // 점프
     public void jumping() {
