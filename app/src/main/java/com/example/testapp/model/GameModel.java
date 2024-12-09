@@ -159,9 +159,11 @@ public class GameModel {
             currentDistance = totalDistance;
             isEnd = true;
         }
+        // 은영
         updateScoreBasedOnDistance();
 
     }
+    // 은영
     private void updateScoreBasedOnDistance() {
         // 단위 거리 * 점수
         score = currentDistance / 28 * 5; // 28 거리마다 5점
