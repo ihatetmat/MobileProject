@@ -2,6 +2,7 @@ package com.example.testapp.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -294,7 +295,9 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // 상대 데이터 수신
                     int opponentDistance = inStream.readInt(); // 거리
+                    Log.d("opp dis", "opp dis" + opponentDistance);
                     int gameResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
+                    Log.d("opp res", "opp res" + gameResult);
                     // UI 업데이트
                     runOnUiThread(() -> {
                         updateOpponentPosition(opponentDistance); // 거리 업데이트

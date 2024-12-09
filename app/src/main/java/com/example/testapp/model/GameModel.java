@@ -5,7 +5,6 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.example.testapp.controller.GameController;
 import com.example.testapp.object.Obstacle;
 
 import java.util.ArrayList;
@@ -21,7 +20,6 @@ public class GameModel {
     private int totalDistance = 1000; // todo: 아직 예상이여서 추후에 정확한 값 정하기
     private int currentDistance = 0;
     private boolean isColliding = false;
-    private GameController gameController;
     private boolean isEnd;
 
     public GameModel(Context context) {

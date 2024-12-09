@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -97,7 +96,6 @@ public class GameView extends View {
                                     : playerTop - obstacle.getHeight() + 50;
 
                             obstacle.setY(obstacleY);
-                            Log.d("asd", String.valueOf((int) (obstacle.getX() - 500 * deltaTime)));
                         }, (int) (obstacle.getX() - 500 * deltaTime));
                     }
 
