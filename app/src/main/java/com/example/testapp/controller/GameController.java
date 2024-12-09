@@ -47,7 +47,7 @@ public class GameController {
     }
     // 게임 일시정지
     public void pauseGame() {
-        if (!isPaused) {
+        if (!isPaused) {    
             isPaused = true;
             gameState = GameState.Paused;
             gameView.setPause(true);

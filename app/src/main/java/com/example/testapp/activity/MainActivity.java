@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         FrameLayout gameContainer = findViewById(R.id.mainFrame); // 기존 ConstraintLayout의 ID
         gameContainer.addView(playerView);
         playerView.invalidate();
-        //jmgeum
+        // 종민
         gameController.startGame();
         startGameLoop();
         // shkim
@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         handler.post(collisionCheckRunnable);
 
     }
+    // 종민
     // 게임 시작 루프
     private void startGameLoop() {
         updateRunnable = new Runnable() {
@@ -163,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
         }
     }
-
+    // 종민
     // OnClickListener 정의
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -182,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    // 종민
     private void updateCharacterPosition() {
         // 게임 모델의 현재 거리와 총 거리를 가져와 계산
         int totalDistance = gameController.getGameModel().getTotalDistance();
@@ -197,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
         // 점의 위치 업데이트
         characterPosition.setTranslationX(newPosition);
     }
+    // 종민
     // 상대방 캐릭터 위치 업데이트
     private void updateOpponentPosition(int distance) {
         // 총 거리와 상대방 거리 비율 계산
@@ -209,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         // 상대방 점의 View를 이동
         opponentPosition.setTranslationX(newPosition);
     }
+    // 종민
     //소멸자
     @Override
     protected void onDestroy() {
@@ -217,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
         if (playerCount == 2)
             disconnectServer();
     }
+    // 종민
     // 일시정지 오버레이 표시
     private void showOverlay() {
         //overlay 및 resume 버튼 활성화
@@ -227,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
         slideButton.setEnabled(false);
         pauseButton.setEnabled(false);
     }
+    // 종민
     // 일시정지 오버레이 숨김
     private void hideOverlay() {
         //overlay 및 resume 버튼 비활성화
@@ -237,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
         slideButton.setEnabled(true);
         pauseButton.setEnabled(true);
     }
+    //종민
     // 일시정지
     @Override
     protected void onPause() {
@@ -246,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         }
         showOverlay(); // 오버레이 표시
     }
+    // 종민
     ////// 서버 연결 준비
     private boolean connectServer() {
         synchronized (socketReady) {
@@ -267,12 +275,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    // 종민
     // 서버 연결 종료
     private  void disconnectServer(){
         synchronized (socketReady){
             _disconnectServer();
         }
     }
+    // 종민
     private void _disconnectServer() {
         synchronized (socketReady) {
             try {
@@ -287,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
             socket = null;
         }
     }
+    // 종민
     // 수신 스레드
     private Runnable runnable4RecvThread = new Runnable() {
         @Override
@@ -321,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    //종민
     // 전송 스레드
     private Runnable runnable4SendThread = new Runnable() {
         @Override
@@ -354,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
     private void showGameResult(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
+    // 종민
     // 2인용 게임 종료 로직
     private void endGame() {
         handler.removeCallbacks(updateRunnable);

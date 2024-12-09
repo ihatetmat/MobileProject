@@ -9,11 +9,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.testapp.R;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuActivity extends AppCompatActivity { // 종민
 
     private Button onePlayerButton, twoPlayerButton;
 
     @Override
+    // 종민
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
@@ -24,6 +25,7 @@ public class MenuActivity extends AppCompatActivity {
         onePlayerButton.setOnClickListener(onClickListener);
         twoPlayerButton.setOnClickListener(onClickListener);
     }
+    // 종민
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -35,6 +37,7 @@ public class MenuActivity extends AppCompatActivity {
             }
         }
     };
+    // 종민
     // 1~2인용 intent 메시지 전달
     private void putPlayerCount(int playerCount){
         Intent intent = new Intent(MenuActivity.this, MainActivity.class);

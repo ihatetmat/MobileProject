@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.testapp.R;
 
+// 종민
 public class HowToActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

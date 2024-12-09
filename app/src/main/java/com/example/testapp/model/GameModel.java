@@ -141,11 +141,11 @@ public class GameModel {
     public int getTotalDistance(){
         return totalDistance;
     }
-
+    // 종민
     public int getCurrentDistance(){
         return currentDistance;
     }
-
+    // 종민
     public void update() {
         // todo: 움직이는 거리는 정해지는 대로 바꾸기
         updateDistance(1); // 임시 거리 설정
@@ -153,6 +153,7 @@ public class GameModel {
             isEnd = true;
         }
     }
+    // 종민
     public void updateDistance(int distance) {
         currentDistance += distance;
         if (currentDistance > totalDistance) {
@@ -168,10 +169,8 @@ public class GameModel {
         // 단위 거리 * 점수
         score = currentDistance / 28 * 5; // 28 거리마다 5점
     }
-
-
+    // 종민
     public boolean checkGameOver() {
         return isEnd;
     }
-    // 종민
 }
