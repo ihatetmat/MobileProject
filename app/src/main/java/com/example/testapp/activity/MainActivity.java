@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 // 캐릭터 업데이트
-                gameController.getGameModel().update();
                 gameController.updateGameState();
 
                 // 종료조건 확인
@@ -138,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // 캐릭터 위치 업데이트 (Running 상태일 때만 실행)
                 if (gameState == GameController.GameState.Running) {
+                    gameController.getGameModel().update();
                     updateCharacterPosition();
                 }
 
@@ -307,18 +307,20 @@ public class MainActivity extends AppCompatActivity {
                     // 상대 데이터 수신
                     int opponentDistance = inStream.readInt(); // 거리
                     Log.d("opp dis", "opp dis" + opponentDistance);
-                    int gameResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
-                    Log.d("opp res", "opp res" + gameResult);
+                    int oppResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
+                    Log.d("opp res", "opp res" + oppResult);
+                    int myResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
+                    Log.d("my res", "opp res" + myResult);
                     // UI 업데이트
                     runOnUiThread(() -> {
                         updateOpponentPosition(opponentDistance); // 거리 업데이트
-                        if (gameResult == 1) {
+                        if (myResult == 1 || oppResult == 2) {
                             showGameResult("승리하였습니다!");
                             endGame();
-                        } else if (gameResult == 2) {
+                        } else if (myResult == 2 || oppResult == 1) {
                             showGameResult("패배하였습니다.");
                             endGame();
-                        } else if (gameResult == 3) {
+                        } else if (myResult == 3 || oppResult == 3) {
                             showGameResult("무승부입니다.");
                             endGame();
                         }
@@ -343,7 +345,6 @@ public class MainActivity extends AppCompatActivity {
                     synchronized (socketReady) {
                         if (outStream != null) {
                             outStream.writeInt(playerModel.getCurrentDistance());        // 현재 거리 송신
-                            outStream.writeInt(playerModel.getPlayerHealth());                 // 현재 체력 상태 송신
                             outStream.writeInt(playerModel.checkGameOver()? 1 : 0);      // 현재 게임 상태 송신
                             outStream.flush();
                         }
