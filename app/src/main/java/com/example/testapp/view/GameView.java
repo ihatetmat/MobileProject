@@ -62,6 +62,7 @@ public class GameView extends View {
 
     private long lastFrameTime = System.currentTimeMillis();
 
+    // 석환 (일부)
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -132,7 +133,7 @@ public class GameView extends View {
         }
     }
 
-    // 점프 기능
+    // 석환
     public void jump() {
         if (playerState == PlayerState.DEFAULT) {
             playerState = PlayerState.JUMPING;
@@ -152,7 +153,7 @@ public class GameView extends View {
         }
     }
 
-    // 슬라이드 기능
+    // 석환
     public void slide() {
         if (playerState == PlayerState.DEFAULT) {
             playerState = PlayerState.SLIDING;
@@ -166,12 +167,13 @@ public class GameView extends View {
         }
     }
 
-    // 화면 갱신
+    // 석환
     public void invalidateView(PlayerState playerState) {
         this.playerState = playerState;
         invalidate(); // onDraw 호출
     }
 
+    // 석환
     public void setPause(boolean value) {
         this.isPaused = value;
     }

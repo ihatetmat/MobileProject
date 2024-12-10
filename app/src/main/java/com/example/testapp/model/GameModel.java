@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// 석환
 public class GameModel {
     private float characterX, characterY; // 플레이어 1의 좌표
     private float characterWidth, characterHeight;
