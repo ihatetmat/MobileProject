@@ -267,20 +267,19 @@ public class MainActivity extends AppCompatActivity {
                 synchronized (inStreamReady) {
                     inStreamReady.notify(); // 데이터 수신 준비
                 }
-                // 게임 시작 신호 대기 추가
-                //socket.setSoTimeout(10000); // 10초 타임아웃 설정
-                int startSignal = inStream.readInt(); // 서버에서 신호 수신
-                if (startSignal == 1) { // 1: 게임 시작 신호
-                    Log.d("Server", "Game start signal");
-                    return true; // 수신 성공
-                } else {
-                    Log.e("Server", "No start signal");
-                    return false; // 수신 실패
+                while(true) {
+                    gameController.pauseGame();
+                    int startSignal = inStream.readInt(); // 서버에서 신호 수신
+                    if (startSignal == 1) { // 1: 게임 시작 신호
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "게임이 시작되었습니다!", Toast.LENGTH_SHORT).show());
+                        gameController.resumeGame();
+                        break;
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "상대를 기다리고 있습니다...", Toast.LENGTH_SHORT).show());
+                    }
                 }
-            }/* catch (SocketTimeoutException e) {
-                Log.e("Server", "timeout: ");
-                return false; // 타임아웃 시 연결 실패
-          }*/ catch (Exception e) {
+                return true;
+            } catch (Exception e) {
                 _disconnectServer();
                 e.printStackTrace();
                 return false;
@@ -322,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
                     int oppResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
                     Log.d("opp res", "opp res" + oppResult);
                     int myResult = inStream.readInt(); // 게임 상태 변수| 0: 진행중, 1: 승리, 2: 패배, 3: 무승부
-                    Log.d("my res", "opp res" + myResult);
+                    Log.d("my res", "my res" + myResult);
                     // UI 업데이트
                     runOnUiThread(() -> {
                         updateOpponentPosition(opponentDistance); // 거리 업데이트
@@ -357,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                     synchronized (socketReady) {
                         if (outStream != null) {
                             outStream.writeInt(playerModel.getCurrentDistance());        // 현재 거리 송신
-                            outStream.writeInt(playerModel.checkGameOver()? 1 : 0);      // 현재 게임 상태 송신
+                            outStream.writeInt(playerModel.checkGameOver() ? 1 : 0);      // 현재 게임 상태 송신
                             outStream.flush();
                         }
                     }
